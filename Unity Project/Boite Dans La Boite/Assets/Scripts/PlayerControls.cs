@@ -12,6 +12,12 @@ public class PlayerControls : MonoBehaviour {
 
 	public GameObject leftFoot;
 	public GameObject rightFoot;
+	
+	public GameObject leftMiddle;
+	public GameObject rightMiddle;
+	
+	public GameObject leftHead;
+	public GameObject rightHead;
 
 	public float ignoreInputAfterHitTimer; 
 
@@ -30,12 +36,12 @@ public class PlayerControls : MonoBehaviour {
 	{
 		bool isInputToMove = false;
 		bool isOnGround = IsOnGround ();
-		if (Input.GetKey(KeyCode.Q) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) )
+		if (Input.GetKey(KeyCode.Q) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnLeft())
 		{
 			this.GetComponent<Rigidbody>().velocity = new Vector3(- moveForce, this.GetComponent<Rigidbody>().velocity.y, 0);
 			isInputToMove = true;
 		}
-		if (Input.GetKey(KeyCode.D) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) )
+		if (Input.GetKey(KeyCode.D) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnRight())
 		{
 			this.GetComponent<Rigidbody>().velocity = new Vector3(  moveForce, this.GetComponent<Rigidbody>().velocity.y, 0);
 			isInputToMove = true;
@@ -75,6 +81,52 @@ public class PlayerControls : MonoBehaviour {
 		return false;
 	}
 
+	private bool IsObstacleOnRight()
+	{
+		float epsilon = 0.1f;
+		Ray isRightHeadOnObstacleRayPlusEpsilon = new Ray (rightHead.transform.position + epsilon * Vector3.right, Vector3.right);
+		Ray isRightHeadOnObstacleRayMinusEpsilon = new Ray (rightHead.transform.position - epsilon * Vector3.right, Vector3.right);
+		Ray isRightFootOnObstacleRayPlusEpsilon = new Ray (rightFoot.transform.position + epsilon * Vector3.right, Vector3.right);
+		Ray isRightFootOnObstacleRayMinusEpsilon = new Ray (rightFoot.transform.position - epsilon * Vector3.right, Vector3.right);
+		Ray isRightMiddleOnObstacleRayPlusEpsilon = new Ray (rightMiddle.transform.position + epsilon * Vector3.right, Vector3.right);
+		Ray isRightMiddleOnObstacleRayMinusEpsilon = new Ray (rightMiddle.transform.position - epsilon * Vector3.right, Vector3.right);
+		RaycastHit outputHitLeftFoot, outputHitRightFoot;
+		float maxDistance = 0.2f;
+		if ((Physics.Raycast(isRightHeadOnObstacleRayPlusEpsilon, out outputHitLeftFoot, maxDistance - epsilon) && outputHitLeftFoot.collider.tag.Equals("Ground")) ||
+		    (Physics.Raycast(isRightHeadOnObstacleRayMinusEpsilon, out outputHitLeftFoot, maxDistance + epsilon) && outputHitLeftFoot.collider.tag.Equals("Ground")) ||
+		    (Physics.Raycast(isRightFootOnObstacleRayPlusEpsilon, out outputHitRightFoot, maxDistance - epsilon) && outputHitRightFoot.collider.tag.Equals("Ground"))||
+		    (Physics.Raycast(isRightFootOnObstacleRayMinusEpsilon, out outputHitRightFoot, maxDistance + epsilon) && outputHitRightFoot.collider.tag.Equals("Ground"))||
+		    (Physics.Raycast(isRightMiddleOnObstacleRayPlusEpsilon, out outputHitRightFoot, maxDistance + epsilon) && outputHitRightFoot.collider.tag.Equals("Ground")) ||
+		    (Physics.Raycast(isRightMiddleOnObstacleRayMinusEpsilon, out outputHitRightFoot, maxDistance + epsilon) && outputHitRightFoot.collider.tag.Equals("Ground"))  )
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	private bool IsObstacleOnLeft()
+	{
+		float epsilon = 0.1f;
+		Ray isLeftHeadOnObstacleRayPlusEpsilon = new Ray (leftHead.transform.position + epsilon * Vector3.right, -Vector3.right);
+		Ray isLeftHeadOnObstacleRayMinusEpsilon = new Ray (leftHead.transform.position - epsilon * Vector3.right, -Vector3.right);
+		Ray isLeftFootOnObstacleRayPlusEpsilon = new Ray (leftFoot.transform.position + epsilon * Vector3.right, -Vector3.right);
+		Ray isLeftFootOnObstacleRayMinusEpsilon = new Ray (leftFoot.transform.position - epsilon * Vector3.right, -Vector3.right);
+		Ray isLeftMiddleOnObstacleRayPlusEpsilon = new Ray (leftMiddle.transform.position + epsilon * Vector3.right, -Vector3.right);
+		Ray isLeftMiddleOnObstacleRayMinusEpsilon = new Ray (leftMiddle.transform.position - epsilon * Vector3.right, -Vector3.right);
+		RaycastHit outputHit;
+		float maxDistance = 0.2f;
+		if ((Physics.Raycast(isLeftHeadOnObstacleRayPlusEpsilon, out outputHit, maxDistance - epsilon) && outputHit.collider.tag.Equals("Ground")) ||
+		    (Physics.Raycast(isLeftHeadOnObstacleRayMinusEpsilon, out outputHit, maxDistance + epsilon) && outputHit.collider.tag.Equals("Ground")) ||
+		    (Physics.Raycast(isLeftFootOnObstacleRayPlusEpsilon, out outputHit, maxDistance - epsilon) && outputHit.collider.tag.Equals("Ground"))||
+		    (Physics.Raycast(isLeftFootOnObstacleRayMinusEpsilon, out outputHit, maxDistance + epsilon) && outputHit.collider.tag.Equals("Ground"))||
+		    (Physics.Raycast(isLeftMiddleOnObstacleRayPlusEpsilon, out outputHit, maxDistance + epsilon) && outputHit.collider.tag.Equals("Ground"))||
+		    (Physics.Raycast(isLeftMiddleOnObstacleRayMinusEpsilon, out outputHit, maxDistance + epsilon) && outputHit.collider.tag.Equals("Ground")) )
+		{
+			return true;
+		}
+		return false;
+	}
+
 	private void Slide()
 	{
 
@@ -95,6 +147,7 @@ public class PlayerControls : MonoBehaviour {
 
 	public void Hit(Vector3 hitterPosition)
 	{
+		this.GetComponent<AudioSource> ().Play ();
 		lastHitTime = Time.time;
 		float bumpForce = 10;
 		this.GetComponent<Rigidbody> ().velocity = (this.transform.position - hitterPosition).normalized * bumpForce;
