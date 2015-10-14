@@ -4,7 +4,10 @@ using System.Collections;
 public class FacetteSwitchManager : MonoBehaviour {
 
 	public Transform to;
-	public float speed = 0.1F;
+	public float speed = 2.0F;
+
+	private float degree;
+	private float angle;
 
 	// Use this for initialization
 	void Start () {
@@ -15,24 +18,14 @@ public class FacetteSwitchManager : MonoBehaviour {
 
 		if (Input.GetKeyDown("[6]"))
 		{
-			this.transform.RotateAround(transform.position, transform.up, -90);
-			//this.transform.Rotate (0,-90,0, Space.World);
+			degree -= 90f;
 		}
 		if (Input.GetKeyDown("[4]"))
 		{
-			this.transform.RotateAround(transform.position, transform.up, 90);
-			//this.transform.Rotate (0,90,0, Space.World);
+			degree += 90f;
 		}
 
-		/*if (Input.GetKeyDown("[8]"))
-		{
-		    this.transform.RotateAround(transform.position, -transform.right, -90);
-			//this.transform.Rotate (90,0,0,);
-		}
-		if (Input.GetKeyDown("[2]"))
-		{
-			this.transform.RotateAround(transform.position, -transform.right, 90);
-			//this.transform.Rotate (-90,0,0, Space.World);
-		}*/
+		angle = Mathf.LerpAngle(transform.rotation.z, degree, Time.deltaTime);
+		transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(0, degree, 0), speed);
 	}
 }
