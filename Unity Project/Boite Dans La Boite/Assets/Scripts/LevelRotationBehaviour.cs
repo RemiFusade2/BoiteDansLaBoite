@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class LevelRotationBehaviour : MonoBehaviour 
 {
-	public GameObject Level;
+	public List<GameObject> Levels;
 
 	public float angleSpeed;
 
@@ -26,7 +27,13 @@ public class LevelRotationBehaviour : MonoBehaviour
 		{
 			angle = -angleSpeed;
 		}
-		Level.transform.RotateAround(Vector3.zero, Vector3.forward, angle);
+		if (angle != 0)
+		{
+			foreach ( GameObject level in Levels)
+			{
+				level.transform.RotateAround(level.transform.position, level.transform.forward, angle);
+			}
+		}
 		angle = 0;
 	}
 }

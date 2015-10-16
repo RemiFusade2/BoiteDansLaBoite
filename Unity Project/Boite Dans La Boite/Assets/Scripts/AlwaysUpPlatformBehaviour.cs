@@ -11,6 +11,9 @@ public class AlwaysUpPlatformBehaviour : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-		this.transform.LookAt (this.transform.position + Vector3.forward);
+		if (this.transform.parent != null)
+		{
+			this.transform.LookAt (this.transform.position + this.transform.parent.forward);
+		}
 	}
 }

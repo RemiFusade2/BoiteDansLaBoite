@@ -4,25 +4,46 @@ using System.Collections;
 public class RailBehaviour : MonoBehaviour {
 
 	public Vector3 defaultEulerAngles;
+
+	public GameObject sphereToFollow;
+
 	public GameObject onRailPrefabObject;
 
 	private GameObject onRailGameObject;
 
+	public bool activated;
+
+	public void SetActivated(bool newValue)
+	{
+		activated = newValue;
+		InitObject ();
+	}
+
+	private void InitObject()
+	{
+		if (activated && onRailGameObject == null)
+		{
+			Vector3 objectPosition = new Vector3 (sphereToFollow.transform.position.x, sphereToFollow.transform.position.y, 0);
+			Quaternion objectOrientation = Quaternion.Euler ( defaultEulerAngles );
+			onRailGameObject = (GameObject) Instantiate (onRailPrefabObject, objectPosition, objectOrientation);
+			onRailGameObject.transform.parent = this.transform;
+		}
+	}
+
 	// Use this for initialization
 	void Start () 
 	{
-		Vector3 objectPosition = new Vector3 (this.transform.position.x, this.transform.position.y, -0.175f);
-		Quaternion objectOrientation = Quaternion.Euler ( defaultEulerAngles );
-		onRailGameObject = (GameObject) Instantiate (onRailPrefabObject, this.transform.position, objectOrientation);
+		onRailGameObject = null;
+		InitObject ();
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
-		if (onRailGameObject != null)
+		if (activated && onRailGameObject != null)
 		{
-			Vector3 newObjectPosition = new Vector3 (this.transform.position.x, this.transform.position.y, -0.175f);
-			onRailGameObject.transform.localPosition = newObjectPosition;
+			Vector3 newObjectPosition = new Vector3 (sphereToFollow.transform.position.x, sphereToFollow.transform.position.y, this.transform.position.z);
+			onRailGameObject.transform.position = newObjectPosition;
 		}
 	}
 }
