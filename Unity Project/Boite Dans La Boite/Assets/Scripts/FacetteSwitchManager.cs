@@ -18,14 +18,12 @@ public class FacetteSwitchManager : MonoBehaviour {
 	private bool isMoving;
 
 	public List<GameObject> levels;
-	public int defaultLevelIndex;
 
-	private int currentLevelIndex;
+	public int currentLevelIndex;
 
 	// Use this for initialization
 	void Start () {
 		isMoving = false;
-		currentLevelIndex = defaultLevelIndex;
 	}
 	
 	// Update is called once per frame
@@ -75,20 +73,22 @@ public class FacetteSwitchManager : MonoBehaviour {
 				Player.transform.parent = levels[currentLevelIndex].transform; // player is no longer a child of Camera
 				Player.GetComponent<Rigidbody>().useGravity = true;
 				Player.GetComponent<Rigidbody>().velocity = Vector3.zero;
+				Player.GetComponent<Collider>().enabled = true;
 
 				// Beware of particular cases !
+				// When levels are perpendicular, axes X and Z switched
+				Player.transform.localPosition = new Vector3(Player.transform.localPosition.x, Player.transform.localPosition.y, 0);
+
 				if (currentLevelIndex == 0 || currentLevelIndex == 2)
 				{
 					Player.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
-					Player.transform.localPosition = new Vector3(Player.transform.localPosition.x, Player.transform.localPosition.y, 0);
 				}
 				else
 				{
 					Player.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX;
-					Player.transform.localPosition = new Vector3(0, Player.transform.localPosition.y, Player.transform.localPosition.z);
+					//Player.transform.localPosition = new Vector3(0, Player.transform.localPosition.y, Player.transform.localPosition.z);
 				}
 
-				Player.GetComponent<Collider>().enabled = true;
 			}
 		}
 	}
