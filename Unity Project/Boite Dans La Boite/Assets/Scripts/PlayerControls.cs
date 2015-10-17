@@ -3,8 +3,14 @@ using System.Collections;
 
 public class PlayerControls : MonoBehaviour {
 
-	public float jumpForce;
-	public float moveForce;
+	public float initialJumpForce;
+	public float initialMoveForce;
+
+	public float currentJumpForce;
+	public float currentMoveForce;
+
+	public float strongJumpForce;
+	public float strongMoveForce;
 
 	public int airJumpsAuthorized;
 
@@ -25,27 +31,61 @@ public class PlayerControls : MonoBehaviour {
 
 	public float inAirSlowing;
 
+	public bool isOnGround;
+
+	public float thrust;
+	public float thrustInitialValue= 0.0f;
+	public Rigidbody rb;
+	public FacetteSwitchManager facetteScript;
+	public bool switchingFacette = false;
+
+	Vector3 initialVelocity = Vector3.zero;
+	Vector3 initialAngularVelocity = Vector3.zero;
+
+	bool hasSwitched = false;
+
 	// Use this for initialization
 	void Start () {
 		airJumpsExecuted = 0;
 		lastHitTime = 0;
+		rb = this.GetComponent<Rigidbody>();
+		thrustInitialValue = thrust;
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
+		switchingFacette = facetteScript.isMoving;
+
+		if (switchingFacette) {
+			thrust = 0.0f;
+
+			initialVelocity = rb.velocity;
+			initialAngularVelocity = rb.angularVelocity;
+
+			hasSwitched = true;
+
+		} 
+
+		else if(! switchingFacette && hasSwitched)
+		{
+			rb.velocity = initialVelocity;
+			rb.angularVelocity = initialAngularVelocity;
+			hasSwitched = false;
+		}
+
 		if (this.transform.parent != null && !this.transform.parent.tag.Equals("MainCamera"))
 		{
 			bool isInputToMove = false;
-			bool isOnGround = IsOnGround ();
+			isOnGround = IsOnGround ();
 			if (Input.GetKey(KeyCode.Q) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnLeft())
 			{
-				this.GetComponent<Rigidbody>().velocity = new Vector3( 0, this.GetComponent<Rigidbody>().velocity.y, 0) - moveForce * this.transform.right;
+				this.GetComponent<Rigidbody>().velocity = new Vector3( 0, this.GetComponent<Rigidbody>().velocity.y, 0) - currentMoveForce * this.transform.right;
 				isInputToMove = true;
 			}
 			if (Input.GetKey(KeyCode.D) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnRight())
 			{
-				this.GetComponent<Rigidbody>().velocity = new Vector3( 0, this.GetComponent<Rigidbody>().velocity.y, 0) + moveForce * this.transform.right;
+				this.GetComponent<Rigidbody>().velocity = new Vector3( 0, this.GetComponent<Rigidbody>().velocity.y, 0) + currentMoveForce * this.transform.right;
 				isInputToMove = true;
 			}
 			if (isOnGround && !isInputToMove )
@@ -59,7 +99,23 @@ public class PlayerControls : MonoBehaviour {
 			
 			if (Input.GetKeyDown(KeyCode.Space))
 			{
+				thrust = 0.0f;
 				Jump();
+			}
+
+			if(isOnGround && !Input.GetKeyDown(KeyCode.Space) && !switchingFacette)
+			{
+				thrust = thrustInitialValue;
+				rb.AddForce(-transform.up * thrust); 
+				currentMoveForce = strongMoveForce;
+				currentJumpForce = strongJumpForce;
+			}
+
+			if(!isOnGround)
+			{
+				currentJumpForce = initialJumpForce;
+				thrust = 0.0f;
+				currentMoveForce = initialMoveForce;
 			}
 		}
 	}
@@ -139,11 +195,13 @@ public class PlayerControls : MonoBehaviour {
 	{
 		if ( IsOnGround () )
 		{
-			this.GetComponent<Rigidbody>().AddForce(jumpForce * Vector3.up);
+			rb.velocity = Vector3.zero;
+			rb.angularVelocity = Vector3.zero; 
+			this.GetComponent<Rigidbody>().AddForce(currentJumpForce * Vector3.up );
 		}
 		else if (airJumpsExecuted < airJumpsAuthorized)
 		{
-			this.GetComponent<Rigidbody>().AddForce(jumpForce * Vector3.up);
+			this.GetComponent<Rigidbody>().AddForce(currentJumpForce * Vector3.up );
 			airJumpsExecuted++;
 		}
 	}

@@ -15,11 +15,16 @@ public class FacetteSwitchManager : MonoBehaviour {
 	public float timeBetweenTwoMoves;
 
 	private float lastMoveTime;
-	private bool isMoving;
+	public bool isMoving;
 
 	public List<GameObject> levels;
 
 	public int currentLevelIndex;
+
+	public Rigidbody rb;
+
+	public float timer = 3; // set duration time in seconds in the Inspector
+	public bool launchTimer = false;
 
 	// Use this for initialization
 	void Start () {
@@ -29,6 +34,10 @@ public class FacetteSwitchManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
+		if (timer > 0)
+		{ 
+			 
+		} 
 
 		if (!isMoving && (Time.time - lastMoveTime) > timeBetweenTwoMoves)
 		{			
@@ -36,13 +45,33 @@ public class FacetteSwitchManager : MonoBehaviour {
 			{
 				degree -= 90f;
 				currentLevelIndex = (currentLevelIndex + levels.Count - 1) % levels.Count;
-				isMoving = true;
+
+				launchTimer = true;
+				timer = 3.0f;
+				//isMoving = true;
 			}
 			if (Input.GetKeyDown("[4]"))
 			{
 				degree += 90f;
 				currentLevelIndex = (currentLevelIndex + 1) % levels.Count;
-				isMoving = true;
+
+				launchTimer = true;
+				timer = 3.0f;
+
+				//isMoving = true;
+			}
+
+			if(launchTimer)
+			{
+				timer -= Time.deltaTime;
+				Player.transform.parent = this.transform; // player is now child of Camera
+				Player.GetComponent<Rigidbody>().useGravity = false;
+				Player.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
+				if(timer <= 0.0f)
+				{
+					isMoving = true;
+				}
 			}
 			if (isMoving)
 			{
@@ -51,11 +80,15 @@ public class FacetteSwitchManager : MonoBehaviour {
 				Player.GetComponent<Rigidbody>().useGravity = false;
 				Player.GetComponent<Rigidbody>().velocity = Vector3.zero;
 				Player.GetComponent<Collider>().enabled = false;
+				launchTimer = false;
 			}
 		}
 
 		if (isMoving)
 		{
+			rb.velocity = Vector3.zero;
+			rb.angularVelocity = Vector3.zero; 
+
 			//angle = Mathf.LerpAngle(transform.rotation.z, degree, Time.deltaTime);
 			Quaternion targetOrientation = Quaternion.Euler (0, degree, 0);
 			transform.rotation = Quaternion.RotateTowards(transform.rotation, targetOrientation, speed);
