@@ -37,7 +37,5 @@ public class DeadlyObstaclesBehaviour : MonoBehaviour {
 	{
 		player.Hit(this.transform.position);
 		roundScript.upScore = true;
-
-		Debug.Log ("hello");
 	}
 }

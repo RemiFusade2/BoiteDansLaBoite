@@ -14,6 +14,8 @@ public class RoundManager : MonoBehaviour {
 	public bool upScore = false;
 	bool gameOver = false;
 
+	bool showTimerInterRound = false;
+
 	public int playerOneScore = 0;
 	public int playerTwoScore = 0;
 
@@ -28,13 +30,18 @@ public class RoundManager : MonoBehaviour {
 
 		if (!gameOver) {
 			if (!interRound)
+			{
 				timer -= Time.deltaTime;
+			}
 			
 			if (interRound) {
 				interRoundTimer -= Time.deltaTime;
+				showTimerInterRound = true;
 			}
-			
+
+
 			if (interRoundTimer <= 0.0f) {
+				showTimerInterRound = false;
 				interRoundTimer = 3.0f;
 				interRound = false;
 			}
@@ -58,12 +65,6 @@ public class RoundManager : MonoBehaviour {
 			if (currentRound == 4)
 				gameOver = true;
 		} 
-
-		else 
-		{
-
-		}
-
 	}
 
 	void OnGUI()
@@ -75,6 +76,19 @@ public class RoundManager : MonoBehaviour {
 		GUI.Label (new Rect (Screen.width - 180, 10, 100, 20), "Player Two Score : ", myGui); 
 		GUI.Label (new Rect (Screen.width - 25, 35, 100, 20), playerTwoScore.ToString(), myGui); 
 
+		if (showTimerInterRound == true && interRoundTimer > 0) 
+		{
+			int timer = (int) interRoundTimer +1 ;
+			GUI.Label (new Rect (Screen.width / 2, 10, 100, 20), timer.ToString (), myGui); 
+		}
+
+		if (gameOver) 
+		{
+			GUI.Box(new Rect(Screen.width/2 - 125, Screen.height/2 - 125,250, 250), "Game Over"); 
+
+			if(GUI.Button(new Rect(Screen.width/2 - 100, Screen.height/2 - 95 ,200, 30), "Retry"))
+				Application.LoadLevel(0);
+		}
 
 	}
 }
