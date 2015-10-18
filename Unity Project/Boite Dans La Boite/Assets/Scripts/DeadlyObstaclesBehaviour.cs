@@ -3,9 +3,14 @@ using System.Collections;
 
 public class DeadlyObstaclesBehaviour : MonoBehaviour {
 
+	public RoundManager roundScript;
+	GameObject roundManager;
+
 	// Use this for initialization
 	void Start () {
-	
+
+		roundManager = GameObject.Find("RoundManager");
+		roundScript = roundManager.GetComponent<RoundManager> ();
 	}
 	
 	// Update is called once per frame
@@ -31,5 +36,8 @@ public class DeadlyObstaclesBehaviour : MonoBehaviour {
 	private void HitPlayer(PlayerControls player) 
 	{
 		player.Hit(this.transform.position);
+		roundScript.upScore = true;
+
+		Debug.Log ("hello");
 	}
 }
