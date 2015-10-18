@@ -15,6 +15,7 @@ public class RoundManager : MonoBehaviour {
 	bool gameOver = false;
 
 	bool showTimerInterRound = false;
+	bool startTimer = true;
 
 	public int playerOneScore = 0;
 	public int playerTwoScore = 0;
@@ -34,15 +35,15 @@ public class RoundManager : MonoBehaviour {
 				timer -= Time.deltaTime;
 			}
 			
-			if (interRound) {
+			if (interRound || startTimer) {
 				interRoundTimer -= Time.deltaTime;
 				showTimerInterRound = true;
 			}
 
-
 			if (interRoundTimer <= 0.0f) {
 				showTimerInterRound = false;
 				interRoundTimer = 3.0f;
+				startTimer = false;
 				interRound = false;
 			}
 			
@@ -52,12 +53,12 @@ public class RoundManager : MonoBehaviour {
 				interRound = true;
 			}
 			
-			if (currentRound == 0 && upScore == true || currentRound == 2 && upScore == true) {
+			if (currentRound == 0 && upScore == true && ! startTimer || currentRound == 2 && upScore == true && ! startTimer) {
 				playerOneScore += 10;
 				upScore = false;
 			}
 			
-			if (currentRound == 1 && upScore == true || currentRound == 3 && upScore == true) {
+			if (currentRound == 1 && upScore == true && ! startTimer || currentRound == 3 && upScore == true && ! startTimer) {
 				playerTwoScore += 10;
 				upScore = false;
 			}
