@@ -63,6 +63,7 @@ public class FacetteSwitchManager : MonoBehaviour {
 				Player.transform.parent = this.transform; // player is now child of Camera
 				Player.GetComponent<Rigidbody>().useGravity = false;
 				Player.GetComponent<Rigidbody>().velocity = Vector3.zero;
+				Player.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
 				if(timer <= 0.0f)
 				{
@@ -75,6 +76,7 @@ public class FacetteSwitchManager : MonoBehaviour {
 				Player.transform.parent = this.transform; // player is now child of Camera
 				Player.GetComponent<Rigidbody>().useGravity = false;
 				Player.GetComponent<Rigidbody>().velocity = Vector3.zero;
+				Player.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 				Player.GetComponent<Collider>().enabled = false;
 				launchTimer = false;
 			}
@@ -82,8 +84,11 @@ public class FacetteSwitchManager : MonoBehaviour {
 
 		if (isMoving)
 		{
-			rb.velocity = Vector3.zero;
-			rb.angularVelocity = Vector3.zero; 
+			if (rb != null)
+			{
+				rb.velocity = Vector3.zero;
+				rb.angularVelocity = Vector3.zero; 
+			}
 
 			//angle = Mathf.LerpAngle(transform.rotation.z, degree, Time.deltaTime);
 			Quaternion targetOrientation = Quaternion.Euler (0, degree, 0);

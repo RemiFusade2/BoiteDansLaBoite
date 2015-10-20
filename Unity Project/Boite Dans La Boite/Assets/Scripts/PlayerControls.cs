@@ -3,6 +3,8 @@ using System.Collections;
 
 public class PlayerControls : MonoBehaviour {
 
+	public Camera mainCamera;
+
 	public float initialJumpForce;
 	public float initialMoveForce;
 
@@ -44,12 +46,20 @@ public class PlayerControls : MonoBehaviour {
 
 	bool hasSwitched = false;
 
+	public GameObject playerSprite;
+	private Vector3 initialPlayerSpriteHorizontalScale;
+
 	// Use this for initialization
 	void Start () {
 		airJumpsExecuted = 0;
 		lastHitTime = 0;
 		rb = this.GetComponent<Rigidbody>();
 		thrustInitialValue = thrust;
+		
+		if (playerSprite != null) 
+		{
+			initialPlayerSpriteHorizontalScale = playerSprite.transform.localScale;
+		}
 	}
 	
 	// Update is called once per frame
@@ -74,48 +84,54 @@ public class PlayerControls : MonoBehaviour {
 			hasSwitched = false;
 		}
 
-		if (this.transform.parent != null && !this.transform.parent.tag.Equals("MainCamera"))
-		{
+		if (this.transform.parent != null && !this.transform.parent.tag.Equals ("MainCamera")) {
 			bool isInputToMove = false;
 			isOnGround = IsOnGround ();
-			if (Input.GetKey(KeyCode.Q) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnLeft())
-			{
-				this.GetComponent<Rigidbody>().velocity = new Vector3( 0, this.GetComponent<Rigidbody>().velocity.y, 0) - currentMoveForce * this.transform.right;
+			if (Input.GetKey (KeyCode.Q) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnLeft ()) {
+				this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) - currentMoveForce * this.transform.right;
 				isInputToMove = true;
 			}
-			if (Input.GetKey(KeyCode.D) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnRight())
-			{
-				this.GetComponent<Rigidbody>().velocity = new Vector3( 0, this.GetComponent<Rigidbody>().velocity.y, 0) + currentMoveForce * this.transform.right;
+			if (Input.GetKey (KeyCode.D) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnRight ()) {
+				this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) + currentMoveForce * this.transform.right;
 				isInputToMove = true;
 			}
-			if (isOnGround && !isInputToMove )
-			{
-				this.GetComponent<Rigidbody>().velocity = new Vector3(0, this.GetComponent<Rigidbody>().velocity.y, 0);
+			if (isOnGround && !isInputToMove) {
+				this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0);
 			}
-			if (!isOnGround)
-			{
-				this.GetComponent<Rigidbody>().velocity = this.GetComponent<Rigidbody>().velocity * inAirSlowing;
+			if (!isOnGround) {
+				this.GetComponent<Rigidbody> ().velocity = this.GetComponent<Rigidbody> ().velocity * inAirSlowing;
 			}
 			
-			if (Input.GetKeyDown(KeyCode.Space))
-			{
+			if (Input.GetKeyDown (KeyCode.Space)) {
 				thrust = 0.0f;
-				Jump();
+				Jump ();
 			}
 
-			if(isOnGround && !Input.GetKeyDown(KeyCode.Space) && !switchingFacette)
-			{
+			if (isOnGround && !Input.GetKeyDown (KeyCode.Space) && !switchingFacette) {
 				thrust = thrustInitialValue;
-				rb.AddForce(-transform.up * thrust); 
+				rb.AddForce (-transform.up * thrust); 
 				currentMoveForce = strongMoveForce;
 				currentJumpForce = strongJumpForce;
 			}
 
-			if(!isOnGround)
-			{
+			if (!isOnGround) {
 				currentJumpForce = initialJumpForce;
 				thrust = 0.0f;
 				currentMoveForce = initialMoveForce;
+			}
+
+			if (this.GetComponent<Animator> () != null) {
+				Vector3 horizontalVelocity = new Vector3 (this.GetComponent<Rigidbody> ().velocity.x, 0, this.GetComponent<Rigidbody> ().velocity.z);
+				this.GetComponent<Animator> ().SetInteger ("moveSpeed", Mathf.RoundToInt (horizontalVelocity.magnitude));
+				this.GetComponent<Animator> ().SetBool ("onGround", isOnGround);
+			}
+
+			if (mainCamera != null) {				
+				float direction = Vector3.Dot (this.GetComponent<Rigidbody> ().velocity, mainCamera.transform.right);
+				float epsilon = 0.01f;
+				if (playerSprite != null && Mathf.Abs (direction) > epsilon) {
+					playerSprite.transform.localScale = new Vector3 ((direction < 0 ? -1 : 1) * initialPlayerSpriteHorizontalScale.x, initialPlayerSpriteHorizontalScale.y, initialPlayerSpriteHorizontalScale.z);
+				}
 			}
 		}
 	}
@@ -212,6 +228,7 @@ public class PlayerControls : MonoBehaviour {
 		lastHitTime = Time.time;
 		float bumpForce = 10;
 		this.GetComponent<Rigidbody> ().velocity = (this.transform.position - hitterPosition).normalized * bumpForce;
+		this.GetComponent<Animator> ().SetTrigger ("hit");
 	}
 
 	public void Bump(Vector3 bumperPosition, float bumpForce)
