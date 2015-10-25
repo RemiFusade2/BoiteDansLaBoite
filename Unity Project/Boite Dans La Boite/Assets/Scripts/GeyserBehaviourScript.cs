@@ -28,11 +28,6 @@ public class GeyserBehaviourScript : MonoBehaviour {
 	RoundManager roundScript;
 	GameObject roundManager;
 
-	public bool bottom = false;
-	public bool top = false;
-	public bool right = false;
-	public bool left = false;
-
 	// Use this for initialization
 	void Start () {
 
@@ -69,16 +64,7 @@ public class GeyserBehaviourScript : MonoBehaviour {
 
 		if (launchGrowUp) 
 		{
-			if(bottom)
-				transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(transform.localPosition.x, oldPosition.y + size/2.0f, transform.localPosition.z), Time.deltaTime * speed);
-			else if (top)
-				transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(transform.localPosition.x, oldPosition.y - size/2.0f, transform.localPosition.z), Time.deltaTime * speed);
-			else if (right)
-				transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(oldPosition.x - size/2.0f, transform.localPosition.y , transform.localPosition.z), Time.deltaTime * speed);
-			else if (left)
-				transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(oldPosition.x + size/2.0f, transform.localPosition.y, transform.localPosition.z), Time.deltaTime * speed);
-
-
+			transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(transform.localPosition.x, oldPosition.y + size/2.0f, transform.localPosition.z), Time.deltaTime * speed);
 			transform.localScale = Vector3.Lerp (transform.localScale, newScale, Time.deltaTime * speed);
 
 			growUp = false;
@@ -105,16 +91,7 @@ public class GeyserBehaviourScript : MonoBehaviour {
 
 		if (launchShrink) 
 		{
-
-			if(bottom)
-				transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(transform.localPosition.x, oldPosition.y - size/2.0f, transform.localPosition.z), Time.deltaTime * speed);
-			else if (top)
-				transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(transform.localPosition.x, oldPosition.y + size/2.0f, transform.localPosition.z), Time.deltaTime * speed);
-			else if (right)
-				transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(oldPosition.x + size/2.0f, transform.localPosition.y , transform.localPosition.z), Time.deltaTime * speed);
-			else if (left)
-				transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(oldPosition.x - size/2.0f, transform.localPosition.y, transform.localPosition.z), Time.deltaTime * speed);
-
+			transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(transform.localPosition.x, oldPosition.y - size/2.0f, transform.localPosition.z), Time.deltaTime * speed);
 			transform.localScale = Vector3.Lerp(transform.localScale, newScale, Time.deltaTime * speed);
 			
 			shrink = false;

@@ -99,5 +99,10 @@ public class PlatformBehaviour : MonoBehaviour
 	private void BumpPlayer(PlayerControls player) 
 	{
 		player.Bump(this.transform.position, bumpForce);
+
+		if (this.gameObject.GetComponent<Animator>() != null)
+		{
+			this.gameObject.GetComponent<Animator>().SetTrigger("Bump");
+		}
 	}
 }
