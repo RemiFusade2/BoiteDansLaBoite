@@ -76,7 +76,7 @@ public class FacetteSwitchManager : MonoBehaviour {
 				Player.GetComponent<Rigidbody>().useGravity = false;
 				Player.GetComponent<Rigidbody>().velocity = Vector3.zero;
 				Player.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-				Player.GetComponent<Collider>().enabled = false;
+				Player.GetComponent<PlayerControls>().DisableColliders();
 				launchTimer = false;
 
 				// activate rails
@@ -115,7 +115,7 @@ public class FacetteSwitchManager : MonoBehaviour {
 				Player.transform.parent = levels[currentLevelIndex].transform; // player is no longer a child of Camera
 				Player.GetComponent<Rigidbody>().useGravity = true;
 				Player.GetComponent<Rigidbody>().velocity = Vector3.zero;
-				Player.GetComponent<Collider>().enabled = true;
+				Player.GetComponent<PlayerControls>().EnableColliders();
 
 				// Beware of particular cases !
 				// When levels are perpendicular, axes X and Z switched

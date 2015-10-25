@@ -245,4 +245,19 @@ public class PlayerControls : MonoBehaviour {
 		lastHitTime = Time.time;
 		this.GetComponent<Rigidbody> ().velocity = (this.transform.position - bumperPosition).normalized * bumpForce;
 	}
+
+	public void DisableColliders()
+	{
+		foreach (Collider col in this.GetComponents<Collider>()) 
+		{
+			col.enabled = false;
+		}
+	}
+	public void EnableColliders()
+	{		
+		foreach (Collider col in this.GetComponents<Collider>()) 
+		{
+			col.enabled = true;
+		}
+	}
 }

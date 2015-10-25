@@ -11,19 +11,16 @@ public class RailBehaviour : MonoBehaviour {
 
 	private GameObject onRailGameObject;
 
-	public bool activated;
-
 	public bool perpendicularLevel;
 
 	public void SetActivated(bool newValue)
 	{
-		activated = newValue;
 		InitObject ();
 	}
 
 	private void InitObject()
 	{
-		if (activated && onRailGameObject == null)
+		if (onRailGameObject == null)
 		{
 			Vector3 objectPosition = new Vector3 (perpendicularLevel ? 0 : sphereToFollow.transform.position.x, sphereToFollow.transform.position.y, perpendicularLevel ? sphereToFollow.transform.position.z : 0);
 			Quaternion objectOrientation = Quaternion.Euler ( new Vector3 ( defaultEulerAngles.x, defaultEulerAngles.y + (perpendicularLevel ? 90.0f : 0.0f), defaultEulerAngles.z ) );
@@ -42,7 +39,7 @@ public class RailBehaviour : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-		if (activated && onRailGameObject != null)
+		if (onRailGameObject != null)
 		{
 			Vector3 newObjectPosition = new Vector3 (perpendicularLevel ? this.transform.position.x : sphereToFollow.transform.position.x, sphereToFollow.transform.position.y, perpendicularLevel ? sphereToFollow.transform.position.z : this.transform.position.z);
 			onRailGameObject.transform.position = newObjectPosition;
