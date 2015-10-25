@@ -34,7 +34,6 @@ public class FacetteSwitchManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-
 		if (!isMoving && (Time.time - lastMoveTime) > timeBetweenTwoMoves)
 		{			
 			if (Input.GetKeyDown("[6]"))
@@ -79,6 +78,15 @@ public class FacetteSwitchManager : MonoBehaviour {
 				Player.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 				Player.GetComponent<Collider>().enabled = false;
 				launchTimer = false;
+
+				// activate rails
+				foreach (Transform child in levels[currentLevelIndex].transform)
+				{
+					if (child.tag.Equals("Rail"))
+					{
+						child.GetComponent<RailBehaviour>().SetActivated(true);
+					}
+				}
 			}
 		}
 

@@ -26,7 +26,7 @@ public class RailBehaviour : MonoBehaviour {
 		if (activated && onRailGameObject == null)
 		{
 			Vector3 objectPosition = new Vector3 (perpendicularLevel ? 0 : sphereToFollow.transform.position.x, sphereToFollow.transform.position.y, perpendicularLevel ? sphereToFollow.transform.position.z : 0);
-			Quaternion objectOrientation = Quaternion.Euler ( defaultEulerAngles );
+			Quaternion objectOrientation = Quaternion.Euler ( new Vector3 ( defaultEulerAngles.x, defaultEulerAngles.y + (perpendicularLevel ? 90.0f : 0.0f), defaultEulerAngles.z ) );
 			onRailGameObject = (GameObject) Instantiate (onRailPrefabObject, objectPosition, objectOrientation);
 			onRailGameObject.transform.parent = this.transform;
 		}
