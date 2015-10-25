@@ -25,6 +25,9 @@ public class GeyserBehaviourScript : MonoBehaviour {
 	Vector3 newScale;
 	Vector3 oldPosition;
 
+	RoundManager roundScript;
+	GameObject roundManager;
+
 	// Use this for initialization
 	void Start () {
 
@@ -35,6 +38,8 @@ public class GeyserBehaviourScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
+		Debug.Log ("local position?: " + transform.localPosition);
 
 		//P2 special power 2
 		if (Input.GetKeyDown ("[2]")) 
@@ -50,7 +55,7 @@ public class GeyserBehaviourScript : MonoBehaviour {
 		if (timer <= 0.0f && growUp) {
 
 			newScale = new Vector3 (initialScale.transform.localScale.x, initialScale.transform.localScale.y + size, initialScale.transform.localScale.z);
-			oldPosition = initialScale.transform.position;
+			oldPosition = initialScale.transform.localPosition;
 
 			launchGrowUp = true;
 			launchTimer = false;
@@ -59,7 +64,7 @@ public class GeyserBehaviourScript : MonoBehaviour {
 
 		if (launchGrowUp) 
 		{
-			transform.position = Vector3.Lerp(transform.position, new Vector3(transform.position.x, oldPosition.y + size/2.0f, transform.position.z), Time.deltaTime * speed);
+			transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(transform.localPosition.x, oldPosition.y + size/2.0f, transform.localPosition.z), Time.deltaTime * speed);
 			transform.localScale = Vector3.Lerp (transform.localScale, newScale, Time.deltaTime * speed);
 
 			growUp = false;
@@ -78,7 +83,7 @@ public class GeyserBehaviourScript : MonoBehaviour {
 		if (timerToShrink <= 0.0f && shrink)
 		{
 			newScale = new Vector3 (initialScale.transform.localScale.x, initialScale.transform.localScale.y - size, initialScale.transform.localScale.z);
-			oldPosition = initialScale.transform.position;
+			oldPosition = initialScale.transform.localPosition;
 
 			launchShrink = true;
 
@@ -86,7 +91,7 @@ public class GeyserBehaviourScript : MonoBehaviour {
 
 		if (launchShrink) 
 		{
-			transform.position = Vector3.Lerp(transform.position, new Vector3(transform.position.x, oldPosition.y - size/2.0f, transform.position.z), Time.deltaTime * speed);
+			transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(transform.localPosition.x, oldPosition.y - size/2.0f, transform.localPosition.z), Time.deltaTime * speed);
 			transform.localScale = Vector3.Lerp(transform.localScale, newScale, Time.deltaTime * speed);
 			
 			shrink = false;
