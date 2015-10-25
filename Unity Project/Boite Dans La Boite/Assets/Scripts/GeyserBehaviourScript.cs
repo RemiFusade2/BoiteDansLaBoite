@@ -4,13 +4,26 @@ using System.Collections;
 public class GeyserBehaviourScript : MonoBehaviour {
 
 	Transform initialScale;
-	Transform newScale;
+
+	public float size = 5.0f;
 
 	public float timer = 0.0f;
 	float initialTimer = 0.0f;
 
+	float timerToShrink = 0.0f;
+	public float initialTimerToShrink = 0.0f;
+
+	public float speed = 1.0f;
+
 	bool growUp = true;
 	bool shrink = false;
+
+	bool launchGrowUp = false;
+	bool launchShrink = false;
+	bool launchTimer = false;
+
+	Vector3 newScale;
+	Vector3 oldPosition;
 
 	// Use this for initialization
 	void Start () {
@@ -22,51 +35,68 @@ public class GeyserBehaviourScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
-		timer -= Time.deltaTime;
+
+		//P2 special power 2
+		if (Input.GetKeyDown ("[2]")) 
+		{
+			timer = initialTimer;
+			launchTimer = true;
+
+		}
+
+		if(launchTimer)
+			timer -= Time.deltaTime;
 
 		if (timer <= 0.0f && growUp) {
 
-			Vector3 newScale = new Vector3 (initialScale.transform.localScale.x, initialScale.transform.localScale.y + 5.0f, initialScale.transform.localScale.z);
-			Debug.Log ("new Scale: " + newScale);
-		
-			//scaling step
-			/*float scaleStep += (Time.deltaTime/scalingDuration);
-			Debug.Log ("player's scale: " + transform.localScale.x);*/
+			newScale = new Vector3 (initialScale.transform.localScale.x, initialScale.transform.localScale.y + size, initialScale.transform.localScale.z);
+			oldPosition = initialScale.transform.position;
 
-			transform.Translate (0, 2.0f, 0, Space.Self);
+			launchGrowUp = true;
+			launchTimer = false;
+					
+		}
 
-			transform.localScale = Vector3.Lerp (transform.localScale, newScale, 0.5f);
-
-			timer = initialTimer;
+		if (launchGrowUp) 
+		{
+			transform.position = Vector3.Lerp(transform.position, new Vector3(transform.position.x, oldPosition.y + size/2.0f, transform.position.z), Time.deltaTime * speed);
+			transform.localScale = Vector3.Lerp (transform.localScale, newScale, Time.deltaTime * speed);
 
 			growUp = false;
-			shrink = true;
+
+			if(this.transform.localScale.y >= newScale.y - 0.1f)
+			{
+				shrink = true;
+				launchGrowUp = false;
+				timerToShrink = initialTimerToShrink;
+			}
 		}
 
-		if (timer <= 0.0f && shrink)
+		if(shrink)
+			timerToShrink -= Time.deltaTime;
+
+		if (timerToShrink <= 0.0f && shrink)
 		{
-			Vector3 newScale = new Vector3 (initialScale.transform.localScale.x, initialScale.transform.localScale.y - 5.0f, initialScale.transform.localScale.z);
-			Debug.Log ("new Scale: " + newScale);
-			
-			//scaling step
-			/*float scaleStep =  Time.deltaTime/1.0f;
-			Debug.Log ("player's scale: " + transform.localScale.x);*/
-			
-			//alter player's scale
+			newScale = new Vector3 (initialScale.transform.localScale.x, initialScale.transform.localScale.y - size, initialScale.transform.localScale.z);
+			oldPosition = initialScale.transform.position;
 
-			transform.Translate (0, -2.0f, 0, Space.Self);
+			launchShrink = true;
 
-
-			transform.localScale = Vector3.Lerp (transform.localScale, newScale, 0.5f);
-
-			timer = initialTimer;
-			
-			growUp = true;
-			shrink = false;
 		}
 
-
-
+		if (launchShrink) 
+		{
+			transform.position = Vector3.Lerp(transform.position, new Vector3(transform.position.x, oldPosition.y - size/2.0f, transform.position.z), Time.deltaTime * speed);
+			transform.localScale = Vector3.Lerp(transform.localScale, newScale, Time.deltaTime * speed);
+			
+			shrink = false;
+			
+			if(this.transform.localScale.y <= newScale.y + 0.1f)
+			{
+				growUp = true;
+				launchShrink = false;
+				timer = initialTimer;
+			}
+		}
 	}
 }
