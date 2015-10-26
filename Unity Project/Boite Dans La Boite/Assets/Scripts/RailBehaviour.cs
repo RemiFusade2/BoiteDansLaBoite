@@ -10,8 +10,8 @@ public class RailBehaviour : MonoBehaviour {
 	public GameObject onRailPrefabObject;
 
 	private GameObject onRailGameObject;
-
-	public bool perpendicularLevel;
+	
+	private bool perpendicularLevel;
 
 	public void SetActivated(bool newValue)
 	{
@@ -32,6 +32,8 @@ public class RailBehaviour : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
+		float epsilon = 0.1f;
+		perpendicularLevel = (Mathf.Cos (Mathf.Deg2Rad * this.transform.parent.eulerAngles.y)  < epsilon);
 		onRailGameObject = null;
 		InitObject ();
 	}
