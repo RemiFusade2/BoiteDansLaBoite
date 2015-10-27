@@ -5,6 +5,8 @@ public class PlayerControls : MonoBehaviour {
 
 	public Camera mainCamera;
 
+	public float maxSlopeAngle;
+
 	public float initialJumpForce;
 	public float initialMoveForce;
 
@@ -84,21 +86,30 @@ public class PlayerControls : MonoBehaviour {
 			hasSwitched = false;
 		}
 
-		if (this.transform.parent != null && !this.transform.parent.tag.Equals ("MainCamera")) {
+		if (this.transform.parent != null && !this.transform.parent.tag.Equals ("MainCamera")) 
+		{
 			bool isInputToMove = false;
-			isOnGround = IsOnGround ();
-			if (Input.GetKey (KeyCode.Q) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnLeft ()) {
-				this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) - currentMoveForce * this.transform.right;
+			float slopeAngle;
+			isOnGround = IsOnGround (out slopeAngle);
+			float slopeSlowDownRatioRight = (slopeAngle < -maxSlopeAngle) ? 0 : ((maxSlopeAngle + slopeAngle) / maxSlopeAngle);
+			float slopeSlowDownRatioLeft = (slopeAngle > maxSlopeAngle) ? 0 : ((maxSlopeAngle - slopeAngle) / maxSlopeAngle);
+			Debug.Log("slopeAngle = "+slopeAngle);
+			if (Input.GetKey (KeyCode.Q) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnLeft ()) 
+			{
+				this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) - currentMoveForce * slopeSlowDownRatioLeft * this.transform.right;
 				isInputToMove = true;
 			}
-			if (Input.GetKey (KeyCode.D) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnRight ()) {
-				this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) + currentMoveForce * this.transform.right;
+			if (Input.GetKey (KeyCode.D) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnRight ()) 
+			{
+				this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) + currentMoveForce * slopeSlowDownRatioRight * this.transform.right;
 				isInputToMove = true;
 			}
-			if (isOnGround && !isInputToMove) {
+			if (isOnGround && !isInputToMove) 
+			{
 				this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0);
 			}
-			if (!isOnGround) {
+			if (!isOnGround) 
+			{
 				Vector3 newVelocitySlowedDown = new Vector3(this.GetComponent<Rigidbody> ().velocity.x * inAirSlowing, this.GetComponent<Rigidbody> ().velocity.y, this.GetComponent<Rigidbody> ().velocity.z * inAirSlowing);
 				this.GetComponent<Rigidbody> ().velocity = newVelocitySlowedDown;
 			}
@@ -143,7 +154,7 @@ public class PlayerControls : MonoBehaviour {
 		}
 	}
 
-	private bool IsOnGround()
+	private bool IsOnGround(out float slopeAngle)
 	{
 		float epsilon = 0.1f;
 		Ray isLeftFootGroundedRayPlusEpsilon = new Ray (leftFoot.transform.position + epsilon * Vector3.up, -Vector3.up);
@@ -152,14 +163,34 @@ public class PlayerControls : MonoBehaviour {
 		Ray isRightFootGroundedRayMinusEpsilon = new Ray (rightFoot.transform.position - epsilon * Vector3.up, -Vector3.up);
 		RaycastHit outputHitLeftFoot, outputHitRightFoot;
 		float maxDistance = 0.3f;
+		slopeAngle = 0;
+
+		// left foot
 		if ((Physics.Raycast(isLeftFootGroundedRayPlusEpsilon, out outputHitLeftFoot, maxDistance - epsilon) && outputHitLeftFoot.collider.tag.Equals("Ground")) ||
-		    (Physics.Raycast(isLeftFootGroundedRayMinusEpsilon, out outputHitLeftFoot, maxDistance + epsilon) && outputHitLeftFoot.collider.tag.Equals("Ground")) ||
-		    (Physics.Raycast(isRightFootGroundedRayPlusEpsilon, out outputHitRightFoot, maxDistance - epsilon) && outputHitRightFoot.collider.tag.Equals("Ground"))||
+		    (Physics.Raycast(isLeftFootGroundedRayMinusEpsilon, out outputHitLeftFoot, maxDistance + epsilon) && outputHitLeftFoot.collider.tag.Equals("Ground")) )
+		{
+			float angle = Mathf.Sign ( outputHitLeftFoot.normal.x ) * Mathf.Acos ( outputHitLeftFoot.normal.y ) * Mathf.Rad2Deg; //get angle
+			slopeAngle = angle;
+			if (Mathf.Abs(angle) < maxSlopeAngle)
+			{
+				airJumpsExecuted = 0;
+				return true;
+			}
+		}
+
+		// right foot
+		if ((Physics.Raycast(isRightFootGroundedRayPlusEpsilon, out outputHitRightFoot, maxDistance - epsilon) && outputHitRightFoot.collider.tag.Equals("Ground")) ||
 		    (Physics.Raycast(isRightFootGroundedRayMinusEpsilon, out outputHitRightFoot, maxDistance + epsilon) && outputHitRightFoot.collider.tag.Equals("Ground")) )
 		{
-			airJumpsExecuted = 0;
-			return true;
+			float angle = Mathf.Sign ( outputHitRightFoot.normal.x ) * Mathf.Acos ( outputHitRightFoot.normal.y ) * Mathf.Rad2Deg; //get angle
+			slopeAngle = angle;
+			if (Mathf.Abs(angle) < maxSlopeAngle)
+			{
+				airJumpsExecuted = 0;
+				return true;
+			}
 		}
+
 		return false;
 	}
 
@@ -216,10 +247,11 @@ public class PlayerControls : MonoBehaviour {
 
 	private void Jump()
 	{
-		if ( IsOnGround () )
+		float slopeAngle;
+		if ( IsOnGround (out slopeAngle) )
 		{
 			rb.velocity = Vector3.zero;
-			rb.angularVelocity = Vector3.zero; 
+			rb.angularVelocity = Vector3.zero;
 			//this.GetComponent<Rigidbody>().AddForce(currentJumpForce * Vector3.up );
 			this.GetComponent<Rigidbody>().velocity = new Vector3 (this.GetComponent<Rigidbody>().velocity.x, currentJumpForce / 200.0f, this.GetComponent<Rigidbody>().velocity.z);
 		}

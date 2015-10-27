@@ -33,7 +33,7 @@ public class RailBehaviour : MonoBehaviour {
 	void Start () 
 	{
 		float epsilon = 0.1f;
-		perpendicularLevel = (Mathf.Cos (Mathf.Deg2Rad * this.transform.parent.eulerAngles.y)  < epsilon);
+		perpendicularLevel = (Mathf.Abs (Mathf.Cos (Mathf.Deg2Rad * this.transform.parent.eulerAngles.y)) < epsilon);
 		onRailGameObject = null;
 		InitObject ();
 	}
