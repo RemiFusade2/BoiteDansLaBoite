@@ -114,19 +114,21 @@ public class LevelRotationBehaviour : MonoBehaviour
 			}
 		}
 
-	
-		if (powerActivated == true) {
-			foreach (GameObject level in Levels) {
-				if (level.name == "Level")
-					level.transform.rotation = Quaternion.RotateTowards (level.transform.rotation, target1, speed);
-				else if (level.name == "Level - Middle rigth")
-					level.transform.rotation = Quaternion.RotateTowards (level.transform.rotation, target2, speed);
-				else if (level.name == "Level - Middle Left")
-					level.transform.rotation = Quaternion.RotateTowards (level.transform.rotation, target3, speed);
-				else if (level.name == "Level-Middle Back")
-					level.transform.rotation = Quaternion.RotateTowards (level.transform.rotation, target4, speed);
 
-				Debug.Log(target1.eulerAngles);
+        if (powerActivated == true)
+        {
+            foreach (GameObject level in Levels)
+            {
+                if (level.name == "Level - Haunted Mansion")
+                    level.transform.rotation = Quaternion.RotateTowards(level.transform.rotation, target1, speed);
+                else if (level.name == "Level - Forest")
+                    level.transform.rotation = Quaternion.RotateTowards(level.transform.rotation, target2, speed);
+                else if (level.name == "Level - Blocs")
+                    level.transform.rotation = Quaternion.RotateTowards(level.transform.rotation, target3, speed);
+                else if (level.name == "Level - Doll house")
+                    level.transform.rotation = Quaternion.RotateTowards(level.transform.rotation, target4, speed);
+
+                Debug.Log(target1.eulerAngles);
 			}
 
 			if(Levels[3].transform.rotation ==  target4)
