@@ -54,11 +54,11 @@ public class LevelRotationBehaviour : MonoBehaviour
 
 		else if (!P1isHunted) 
 		{
-			if (Input.GetKey(KeyCode.RightArrow) || Input.GetAxis("Horizontal") > 0.5f )
+			if (Input.GetKey(KeyCode.RightArrow) || Input.GetAxis("Horizontal") > 0.0f )
 			{
 				angle = angleSpeed;
 			}
-			if (Input.GetKey(KeyCode.LeftArrow) || Input.GetAxis("Horizontal") < 0.5f )
+			if (Input.GetKey(KeyCode.LeftArrow) || Input.GetAxis("Horizontal") < 0.0f )
 			{
 				angle = -angleSpeed;
 			}
@@ -127,8 +127,6 @@ public class LevelRotationBehaviour : MonoBehaviour
                     level.transform.rotation = Quaternion.RotateTowards(level.transform.rotation, target3, speed);
                 else if (level.name == "Level - Doll house")
                     level.transform.rotation = Quaternion.RotateTowards(level.transform.rotation, target4, speed);
-
-                Debug.Log(target1.eulerAngles);
 			}
 
 			if(Levels[3].transform.rotation ==  target4)

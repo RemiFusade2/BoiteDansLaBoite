@@ -67,8 +67,13 @@ public class RoundManager : MonoBehaviour {
 				facetteScript.GetComponent<FacetteSwitchManager>().P1isHunted = true;
 
 
-				for(int i = 0; i < 15; i++)				
-					geyserScript[i].GetComponent<Geyser2BehaviourScript>().P1isHunted = true;				
+				while(counter < 17)
+				{
+					geyserScript[counter].GetComponent<Geyser2BehaviourScript>().P1isHunted = true;
+					counter++;
+				}
+				
+				counter = 0;			
 
 			}
 
@@ -78,8 +83,14 @@ public class RoundManager : MonoBehaviour {
 				rotationScript.GetComponent<LevelRotationBehaviour>().P1isHunted = false;
 				facetteScript.GetComponent<FacetteSwitchManager>().P1isHunted = false;
 
-				for(int i = 0; i < counter; i++)				
-					geyserScript[i].GetComponent<Geyser2BehaviourScript>().P1isHunted = false;	
+				while(counter < 17)
+				{
+					geyserScript[counter].GetComponent<Geyser2BehaviourScript>().P1isHunted = false;
+					counter++;
+				}
+
+				counter = 0;
+
 			}
 
 
