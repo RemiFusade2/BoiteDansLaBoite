@@ -22,8 +22,10 @@ public class RoundManager : MonoBehaviour {
 
 	public GameObject playerScript;
 	public GameObject rotationScript;
-	//public GameObject geyserScript;
+	public GameObject[] geyserScript;
 	public GameObject facetteScript;
+
+	public int counter = 0;
 
 	// Use this for initialization
 	void Start () {
@@ -64,6 +66,10 @@ public class RoundManager : MonoBehaviour {
 				rotationScript.GetComponent<LevelRotationBehaviour>().P1isHunted = true;
 				facetteScript.GetComponent<FacetteSwitchManager>().P1isHunted = true;
 
+
+				for(int i = 0; i < 15; i++)				
+					geyserScript[i].GetComponent<Geyser2BehaviourScript>().P1isHunted = true;				
+
 			}
 
 			else if(currentRound == 1 || currentRound == 3)
@@ -71,6 +77,9 @@ public class RoundManager : MonoBehaviour {
 				playerScript.GetComponent<PlayerControls>().P1isHunted = false;
 				rotationScript.GetComponent<LevelRotationBehaviour>().P1isHunted = false;
 				facetteScript.GetComponent<FacetteSwitchManager>().P1isHunted = false;
+
+				for(int i = 0; i < counter; i++)				
+					geyserScript[i].GetComponent<Geyser2BehaviourScript>().P1isHunted = false;	
 			}
 
 
