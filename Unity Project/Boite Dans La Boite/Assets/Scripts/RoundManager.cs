@@ -20,6 +20,11 @@ public class RoundManager : MonoBehaviour {
 	public int playerOneScore = 0;
 	public int playerTwoScore = 0;
 
+	public GameObject playerScript;
+	public GameObject rotationScript;
+	//public GameObject geyserScript;
+	public GameObject facetteScript;
+
 	// Use this for initialization
 	void Start () {
 
@@ -52,10 +57,27 @@ public class RoundManager : MonoBehaviour {
 				timer = initialTimer;
 				interRound = true;
 			}
-			
+
+			if(currentRound == 0 || currentRound == 2)
+			{				
+				playerScript.GetComponent<PlayerControls>().P1isHunted = true;
+				rotationScript.GetComponent<LevelRotationBehaviour>().P1isHunted = true;
+				facetteScript.GetComponent<FacetteSwitchManager>().P1isHunted = true;
+
+			}
+
+			else if(currentRound == 1 || currentRound == 3)
+			{					
+				playerScript.GetComponent<PlayerControls>().P1isHunted = false;
+				rotationScript.GetComponent<LevelRotationBehaviour>().P1isHunted = false;
+				facetteScript.GetComponent<FacetteSwitchManager>().P1isHunted = false;
+			}
+
+
 			if (currentRound == 0 && upScore == true && ! startTimer || currentRound == 2 && upScore == true && ! startTimer) {
 				playerOneScore += 10;
 				upScore = false;
+
 			}
 			
 			if (currentRound == 1 && upScore == true && ! startTimer || currentRound == 3 && upScore == true && ! startTimer) {

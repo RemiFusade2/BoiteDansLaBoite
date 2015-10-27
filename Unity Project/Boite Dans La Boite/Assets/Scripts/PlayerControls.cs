@@ -3,6 +3,8 @@ using System.Collections;
 
 public class PlayerControls : MonoBehaviour {
 
+	public bool P1isHunted = true;
+
 	public Camera mainCamera;
 
 	public float initialJumpForce;
@@ -87,14 +89,30 @@ public class PlayerControls : MonoBehaviour {
 		if (this.transform.parent != null && !this.transform.parent.tag.Equals ("MainCamera")) {
 			bool isInputToMove = false;
 			isOnGround = IsOnGround ();
-			if (Input.GetKey (KeyCode.Q) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnLeft ()) {
+
+			/*if (Input.GetKey (KeyCode.Q) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnLeft ()) {
 				this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) - currentMoveForce * this.transform.right;
 				isInputToMove = true;
 			}
 			if (Input.GetKey (KeyCode.D) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnRight ()) {
 				this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) + currentMoveForce * this.transform.right;
 				isInputToMove = true;
+			}*/
+
+
+
+			if ((Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnRight ()) {
+
+				//this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) * (currentMoveForce * Input.GetAxis("Horizontal")); /*this.transform.right*/;
+
+				if(P1isHunted)
+					transform.Translate(Input.GetAxis("Horizontal")* Time.deltaTime * currentMoveForce,0,0);
+				else if(!P1isHunted)
+					transform.Translate(Input.GetAxis("Horizontal2")* Time.deltaTime * currentMoveForce,0,0);
+				isInputToMove = true;
+
 			}
+
 			if (isOnGround && !isInputToMove) {
 				this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0);
 			}
@@ -104,7 +122,7 @@ public class PlayerControls : MonoBehaviour {
 			}
 
 
-			if (isOnGround && !Input.GetKeyDown (KeyCode.Space)) 
+			if (isOnGround && !Input.GetKeyDown (KeyCode.Space) ) 
 			{
 				thrust = thrustInitialValue;
 				currentMoveForce = strongMoveForce;
@@ -117,12 +135,25 @@ public class PlayerControls : MonoBehaviour {
 				thrust = 0.0f;
 				currentMoveForce = initialMoveForce;
 			}
-			
-			if (Input.GetKeyDown (KeyCode.Space)) 
+
+			if(P1isHunted)
 			{
-				thrust = 0.0f;
-				Jump ();
+				if (Input.GetKeyDown (KeyCode.Space) || Input.GetButtonDown("JumpP1")) 
+				{
+					thrust = 0.0f;
+					Jump ();
+				}
 			}
+
+			else if(!P1isHunted)
+			{
+				if (Input.GetKeyDown (KeyCode.Space) || Input.GetButtonDown("Jump")) 
+				{
+					thrust = 0.0f;
+					Jump ();
+				}
+			}
+
 
 			if (this.GetComponent<Animator> () != null) 
 			{

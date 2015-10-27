@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class FacetteSwitchManager : MonoBehaviour {
 
+	public bool P1isHunted = true;
+
 	public Transform to;
 	public float speed = 2.0F;
 
@@ -23,7 +25,7 @@ public class FacetteSwitchManager : MonoBehaviour {
 
 	public Rigidbody rb;
 
-	public float timer = 3; // set duration time in seconds in the Inspector
+	public float timer = 0.5f; // set duration time in seconds in the Inspector
 	public bool launchTimer = false;
 
 	// Use this for initialization
@@ -35,26 +37,54 @@ public class FacetteSwitchManager : MonoBehaviour {
 	void Update () 
 	{
 		if (!isMoving && (Time.time - lastMoveTime) > timeBetweenTwoMoves)
-		{			
-			if (Input.GetKeyDown("[6]"))
+		{	
+
+			if(P1isHunted)
 			{
-				degree -= 90f;
-				currentLevelIndex = (currentLevelIndex + levels.Count - 1) % levels.Count;
-
-				launchTimer = true;
-				timer = 3.0f;
-				//isMoving = true;
+				if (Input.GetKeyDown("[6]") || Input.GetButtonDown("Fire5"))
+				{
+					degree -= 90f;
+					currentLevelIndex = (currentLevelIndex + levels.Count - 1) % levels.Count;
+					
+					launchTimer = true;
+					timer = 0.5f;
+					//isMoving = true;
+				}
+				if (Input.GetKeyDown("[4]")|| Input.GetButtonDown("Fire4"))
+				{
+					degree += 90f;
+					currentLevelIndex = (currentLevelIndex + 1) % levels.Count;
+					
+					launchTimer = true;
+					timer = 0.5f;
+					
+					//isMoving = true;
+				}
 			}
-			if (Input.GetKeyDown("[4]"))
+
+			else if (!P1isHunted)
 			{
-				degree += 90f;
-				currentLevelIndex = (currentLevelIndex + 1) % levels.Count;
-
-				launchTimer = true;
-				timer = 3.0f;
-
-				//isMoving = true;
+				if (Input.GetKeyDown("[6]") || Input.GetButtonDown("Fire5P1"))
+				{
+					degree -= 90f;
+					currentLevelIndex = (currentLevelIndex + levels.Count - 1) % levels.Count;
+					
+					launchTimer = true;
+					timer = 0.5f;
+					//isMoving = true;
+				}
+				if (Input.GetKeyDown("[4]")|| Input.GetButtonDown("Fire4P1"))
+				{
+					degree += 90f;
+					currentLevelIndex = (currentLevelIndex + 1) % levels.Count;
+					
+					launchTimer = true;
+					timer = 0.5f;
+					
+					//isMoving = true;
+				}
 			}
+
 
 			if(launchTimer)
 			{

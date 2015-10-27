@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class LevelRotationBehaviour : MonoBehaviour 
 {
+	public bool P1isHunted = true;
+
 	public List<GameObject> Levels;
 
 	public float angleSpeed;
@@ -38,14 +40,31 @@ public class LevelRotationBehaviour : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		if (Input.GetKey(KeyCode.RightArrow))
+		if (P1isHunted) 
 		{
-			angle = angleSpeed;
+			if (Input.GetKey(KeyCode.RightArrow) || Input.GetAxis("Horizontal2") > 0.0f )
+			{
+				angle = angleSpeed;
+			}
+			if (Input.GetKey(KeyCode.LeftArrow) || Input.GetAxis("Horizontal2") < 0.0f )
+			{
+				angle = -angleSpeed;
+			}
 		}
-		if (Input.GetKey(KeyCode.LeftArrow))
+
+		else if (!P1isHunted) 
 		{
-			angle = -angleSpeed;
+			if (Input.GetKey(KeyCode.RightArrow) || Input.GetAxis("Horizontal") > 0.5f )
+			{
+				angle = angleSpeed;
+			}
+			if (Input.GetKey(KeyCode.LeftArrow) || Input.GetAxis("Horizontal") < 0.5f )
+			{
+				angle = -angleSpeed;
+			}
 		}
+
+
 		if (angle != 0)
 		{
 			foreach ( GameObject level in Levels)
@@ -59,20 +78,42 @@ public class LevelRotationBehaviour : MonoBehaviour
 		timer -= Time.deltaTime;
 
 		//P2 special power - Appuie sur le "1" du num pad pour faire faire un 180° au niveau
-		if (Input.GetKeyDown ("[1]") && timer <= 0.0f) 
+		if (P1isHunted) 
 		{
-			powerActivated = true;
-
-			Debug.Log(Levels[0].transform.rotation.z*100 + 180.0f);
-
-			target1 = Levels[0].transform.rotation * Quaternion.Euler (0, 0, 180.0f);
-			target2 = Levels[1].transform.rotation * Quaternion.Euler (0, 0, 180.0f);
-			target3 = Levels[2].transform.rotation * Quaternion.Euler (0, 0, 180.0f);
-			target4 = Levels[3].transform.rotation * Quaternion.Euler (0, 0, 180.0f);
-
-			timer += initialTimer;
-
+			if (Input.GetKeyDown ("[1]") && timer <= 0.0f || Input.GetButtonDown("Fire1P2") && timer <= 0.0f) 
+			{
+				powerActivated = true;
+				
+				Debug.Log(Levels[0].transform.rotation.z*100 + 180.0f);
+				
+				target1 = Levels[0].transform.rotation * Quaternion.Euler (0, 0, 180.0f);
+				target2 = Levels[1].transform.rotation * Quaternion.Euler (0, 0, 180.0f);
+				target3 = Levels[2].transform.rotation * Quaternion.Euler (0, 0, 180.0f);
+				target4 = Levels[3].transform.rotation * Quaternion.Euler (0, 0, 180.0f);
+				
+				timer += initialTimer;
+				
+			}
 		}
+
+		else if (!P1isHunted) 
+		{
+			if (Input.GetKeyDown ("[1]") && timer <= 0.0f || Input.GetButtonDown("Fire1") && timer <= 0.0f) 
+			{
+				powerActivated = true;
+				
+				Debug.Log(Levels[0].transform.rotation.z*100 + 180.0f);
+				
+				target1 = Levels[0].transform.rotation * Quaternion.Euler (0, 0, 180.0f);
+				target2 = Levels[1].transform.rotation * Quaternion.Euler (0, 0, 180.0f);
+				target3 = Levels[2].transform.rotation * Quaternion.Euler (0, 0, 180.0f);
+				target4 = Levels[3].transform.rotation * Quaternion.Euler (0, 0, 180.0f);
+				
+				timer += initialTimer;
+				
+			}
+		}
+
 	
 		if (powerActivated == true) {
 			foreach (GameObject level in Levels) {
