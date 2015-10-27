@@ -3,6 +3,8 @@ using System.Collections;
 
 public class PlayerControls : MonoBehaviour {
 
+	public bool P1isHunted = true;
+
 	public Camera mainCamera;
 
 	public float maxSlopeAngle;
@@ -89,11 +91,13 @@ public class PlayerControls : MonoBehaviour {
 		if (this.transform.parent != null && !this.transform.parent.tag.Equals ("MainCamera")) 
 		{
 			bool isInputToMove = false;
+
 			float slopeAngle;
 			isOnGround = IsOnGround (out slopeAngle);
 			float slopeSlowDownRatioRight = (slopeAngle < -maxSlopeAngle) ? 0 : ((maxSlopeAngle + slopeAngle) / maxSlopeAngle);
+			slopeSlowDownRatioRight = (slopeSlowDownRatioRight > 1.1f) ? 1.1f : slopeSlowDownRatioRight;
 			float slopeSlowDownRatioLeft = (slopeAngle > maxSlopeAngle) ? 0 : ((maxSlopeAngle - slopeAngle) / maxSlopeAngle);
-			Debug.Log("slopeAngle = "+slopeAngle);
+			slopeSlowDownRatioLeft = (slopeSlowDownRatioLeft > 1.1f) ? 1.1f : slopeSlowDownRatioLeft;
 			if (Input.GetKey (KeyCode.Q) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnLeft ()) 
 			{
 				this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) - currentMoveForce * slopeSlowDownRatioLeft * this.transform.right;
@@ -104,6 +108,21 @@ public class PlayerControls : MonoBehaviour {
 				this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) + currentMoveForce * slopeSlowDownRatioRight * this.transform.right;
 				isInputToMove = true;
 			}
+
+
+
+			if ((Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnRight ()) 
+			{
+				//this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) * (currentMoveForce * Input.GetAxis("Horizontal")); /*this.transform.right*/;
+
+				if(P1isHunted)
+					transform.Translate(Input.GetAxis("Horizontal")* Time.deltaTime * currentMoveForce,0,0);
+				else if(!P1isHunted)
+					transform.Translate(Input.GetAxis("Horizontal2")* Time.deltaTime * currentMoveForce,0,0);
+				isInputToMove = true;
+
+			}
+
 			if (isOnGround && !isInputToMove) 
 			{
 				this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0);
@@ -115,7 +134,7 @@ public class PlayerControls : MonoBehaviour {
 			}
 
 
-			if (isOnGround && !Input.GetKeyDown (KeyCode.Space)) 
+			if (isOnGround && !Input.GetKeyDown (KeyCode.Space) ) 
 			{
 				thrust = thrustInitialValue;
 				currentMoveForce = strongMoveForce;
@@ -128,12 +147,25 @@ public class PlayerControls : MonoBehaviour {
 				thrust = 0.0f;
 				currentMoveForce = initialMoveForce;
 			}
-			
-			if (Input.GetKeyDown (KeyCode.Space)) 
+
+			if(P1isHunted)
 			{
-				thrust = 0.0f;
-				Jump ();
+				if (Input.GetKeyDown (KeyCode.Space) || Input.GetButtonDown("JumpP1")) 
+				{
+					thrust = 0.0f;
+					Jump ();
+				}
 			}
+
+			else if(!P1isHunted)
+			{
+				if (Input.GetKeyDown (KeyCode.Space) || Input.GetButtonDown("Jump")) 
+				{
+					thrust = 0.0f;
+					Jump ();
+				}
+			}
+
 
 			if (this.GetComponent<Animator> () != null) 
 			{
@@ -169,7 +201,10 @@ public class PlayerControls : MonoBehaviour {
 		if ((Physics.Raycast(isLeftFootGroundedRayPlusEpsilon, out outputHitLeftFoot, maxDistance - epsilon) && outputHitLeftFoot.collider.tag.Equals("Ground")) ||
 		    (Physics.Raycast(isLeftFootGroundedRayMinusEpsilon, out outputHitLeftFoot, maxDistance + epsilon) && outputHitLeftFoot.collider.tag.Equals("Ground")) )
 		{
-			float angle = Mathf.Sign ( outputHitLeftFoot.normal.x ) * Mathf.Acos ( outputHitLeftFoot.normal.y ) * Mathf.Rad2Deg; //get angle
+			float angleSign = mainCamera.transform.right.x >= 0.8f ? Mathf.Sign ( outputHitLeftFoot.normal.x ) :
+							  mainCamera.transform.right.x <= -0.8f ? Mathf.Sign ( -outputHitLeftFoot.normal.x ) :
+							  mainCamera.transform.right.z >= 0.8f ? Mathf.Sign ( outputHitLeftFoot.normal.z ) : Mathf.Sign ( -outputHitLeftFoot.normal.z );
+			float angle = angleSign * Mathf.Acos ( outputHitLeftFoot.normal.y ) * Mathf.Rad2Deg; //get angle
 			slopeAngle = angle;
 			if (Mathf.Abs(angle) < maxSlopeAngle)
 			{
@@ -182,7 +217,10 @@ public class PlayerControls : MonoBehaviour {
 		if ((Physics.Raycast(isRightFootGroundedRayPlusEpsilon, out outputHitRightFoot, maxDistance - epsilon) && outputHitRightFoot.collider.tag.Equals("Ground")) ||
 		    (Physics.Raycast(isRightFootGroundedRayMinusEpsilon, out outputHitRightFoot, maxDistance + epsilon) && outputHitRightFoot.collider.tag.Equals("Ground")) )
 		{
-			float angle = Mathf.Sign ( outputHitRightFoot.normal.x ) * Mathf.Acos ( outputHitRightFoot.normal.y ) * Mathf.Rad2Deg; //get angle
+			float angleSign = mainCamera.transform.right.x >= 0.8f ? Mathf.Sign ( outputHitRightFoot.normal.x ) :
+							  mainCamera.transform.right.x <= -0.8f ? Mathf.Sign ( -outputHitRightFoot.normal.x ) :
+							  mainCamera.transform.right.z >= 0.8f ? Mathf.Sign ( outputHitRightFoot.normal.z ) : Mathf.Sign ( -outputHitRightFoot.normal.z );
+			float angle = angleSign * Mathf.Acos ( outputHitRightFoot.normal.y ) * Mathf.Rad2Deg; //get angle
 			slopeAngle = angle;
 			if (Mathf.Abs(angle) < maxSlopeAngle)
 			{

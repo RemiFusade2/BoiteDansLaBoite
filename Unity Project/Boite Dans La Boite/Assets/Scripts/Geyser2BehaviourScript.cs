@@ -7,6 +7,8 @@ public class Geyser2BehaviourScript : MonoBehaviour {
 
 	private bool isAlreadyFiring;
 
+	public bool P1isHunted = true;
+
 	// Use this for initialization
 	void Start () 
 	{
@@ -17,11 +19,21 @@ public class Geyser2BehaviourScript : MonoBehaviour {
 	void Update () 
 	{		
 		//P2 special power 2
-		if (Input.GetKeyDown ("[2]") && !isAlreadyFiring) 
+		if (P1isHunted) 
 		{
-			isAlreadyFiring = true;
-			StartCountdown();
-		}	
+			if (Input.GetKeyDown ("[2]") && !isAlreadyFiring || Input.GetButtonDown ("Fire2P2") && !isAlreadyFiring) {
+				isAlreadyFiring = true;
+				StartCountdown ();
+			}	
+		}
+
+		else if (!P1isHunted) 
+		{
+			if (Input.GetKeyDown ("[2]") && !isAlreadyFiring || Input.GetButtonDown ("Fire2") && !isAlreadyFiring) {
+				isAlreadyFiring = true;
+				StartCountdown ();
+			}	
+		}
 	}
 
 	public void StartCountdown()

@@ -2,7 +2,9 @@
 using System.Collections;
 
 public class GeyserBehaviourScript : MonoBehaviour {
-	
+
+	public bool P1isHunted = true;
+
 	Transform initialScale;
 	
 	public float size = 5.0f;
@@ -44,15 +46,24 @@ public class GeyserBehaviourScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		
-		Debug.Log ("local position?: " + transform.localPosition);
-		
 		//P2 special power 2
-		if (Input.GetKeyDown ("[2]")) 
+		if (P1isHunted) {
+			if (Input.GetKeyDown ("[2]") || Input.GetButtonDown ("Fire2P2")) {
+				timer = initialTimer;
+				launchTimer = true;
+				
+			}
+		} 
+
+		else if (!P1isHunted) 
 		{
-			timer = initialTimer;
-			launchTimer = true;
-			
+			if (Input.GetKeyDown ("[2]") || Input.GetButtonDown ("Fire2")) {
+				timer = initialTimer;
+				launchTimer = true;
+				
+			}
 		}
+
 		
 		if(launchTimer)
 			timer -= Time.deltaTime;
@@ -104,8 +115,7 @@ public class GeyserBehaviourScript : MonoBehaviour {
 		}
 		
 		if (launchShrink) 
-		{
-			
+		{			
 			if(bottom)
 				transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(transform.localPosition.x, oldPosition.y - size/2.0f, transform.localPosition.z), Time.deltaTime * speed);
 			else if (top)
