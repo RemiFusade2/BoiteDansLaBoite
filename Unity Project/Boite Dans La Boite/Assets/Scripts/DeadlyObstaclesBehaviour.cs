@@ -38,8 +38,7 @@ public class DeadlyObstaclesBehaviour : MonoBehaviour {
 
 	private void HitPlayer(PlayerControls player) 
 	{
-		player.Hit(this.transform.position);
-		if (roundScript != null)
+		if (player.Hit(this.transform.position) && roundScript != null)
 		{
 			roundScript.upScore = true;
 		}

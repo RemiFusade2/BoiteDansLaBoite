@@ -6,6 +6,8 @@ public class MenuEngine : MonoBehaviour {
 	public GameObject mainMenuPanel;
 	public GameObject creditsPanel;
 
+	public GameObject inGameHands;
+
 	// Use this for initialization
 	void Start () {
 	
@@ -31,5 +33,17 @@ public class MenuEngine : MonoBehaviour {
 	public void HideMainMenu()
 	{
 		mainMenuPanel.SetActive (false);
+		inGameHands.GetComponent<Animator> ().SetTrigger ("Start");
+	}
+
+	public void ExitGame()
+	{
+		StartCoroutine (WaitAndQuitApplication (1.0f));
+	}
+
+	IEnumerator WaitAndQuitApplication(float timer)
+	{
+		yield return new WaitForSeconds(timer);
+		Application.Quit();
 	}
 }

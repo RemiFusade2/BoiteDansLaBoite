@@ -53,12 +53,19 @@ public class PlayerControls : MonoBehaviour {
 	public GameObject playerSprite;
 	private Vector3 initialPlayerSpriteHorizontalScale;
 
+	public SoundEngineScript soundEngine;
+
+	private bool invicible;
+	public float invicibilityTimeAfterHit;
+
 	// Use this for initialization
 	void Start () {
 		airJumpsExecuted = 0;
 		lastHitTime = 0;
 		rb = this.GetComponent<Rigidbody>();
 		thrustInitialValue = thrust;
+
+		invicible = false;
 		
 		if (playerSprite != null) 
 		{
@@ -98,30 +105,46 @@ public class PlayerControls : MonoBehaviour {
 			slopeSlowDownRatioRight = (slopeSlowDownRatioRight > 1.1f) ? 1.1f : slopeSlowDownRatioRight;
 			float slopeSlowDownRatioLeft = (slopeAngle > maxSlopeAngle) ? 0 : ((maxSlopeAngle - slopeAngle) / maxSlopeAngle);
 			slopeSlowDownRatioLeft = (slopeSlowDownRatioLeft > 1.1f) ? 1.1f : slopeSlowDownRatioLeft;
-			if (Input.GetKey (KeyCode.Q) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnLeft ()) 
+
+			float controlerInputLimit = 0.1f;
+			float p1ControlerHorizontalInput = Input.GetAxis("Horizontal");
+			float p2ControlerHorizontalInput = Input.GetAxis("Horizontal2");
+			if ( (Input.GetKey (KeyCode.Q) || (P1isHunted && p1ControlerHorizontalInput < -controlerInputLimit) || (!P1isHunted && p2ControlerHorizontalInput < -controlerInputLimit))
+			    && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnLeft ()) 
 			{
-				this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) - currentMoveForce * slopeSlowDownRatioLeft * this.transform.right;
+				float inputRatio = Input.GetKey (KeyCode.Q) ? 1 : Mathf.Abs((P1isHunted ? p1ControlerHorizontalInput : p2ControlerHorizontalInput));
+				Vector3 newVelocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) - inputRatio * currentMoveForce * slopeSlowDownRatioLeft * this.transform.right;
+				if (!float.IsNaN(newVelocity.x) && !float.IsNaN(newVelocity.y) && !float.IsNaN(newVelocity.z))
+				{
+					this.GetComponent<Rigidbody> ().velocity = newVelocity;
+				}
 				isInputToMove = true;
 			}
-			if (Input.GetKey (KeyCode.D) && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnRight ()) 
+			if ( (Input.GetKey (KeyCode.D) || (P1isHunted && p1ControlerHorizontalInput > controlerInputLimit) || (!P1isHunted && p2ControlerHorizontalInput > controlerInputLimit))
+				&& (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnRight ()) 
 			{
-				this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) + currentMoveForce * slopeSlowDownRatioRight * this.transform.right;
+				float inputRatio = Input.GetKey (KeyCode.D) ? 1 : (P1isHunted ? p1ControlerHorizontalInput : p2ControlerHorizontalInput);
+				Vector3 newVelocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) + inputRatio * currentMoveForce * slopeSlowDownRatioRight * this.transform.right;
+				if (!float.IsNaN(newVelocity.x) && !float.IsNaN(newVelocity.y) && !float.IsNaN(newVelocity.z))
+				{
+					this.GetComponent<Rigidbody> ().velocity = newVelocity;
+				}
 				isInputToMove = true;
 			}
 
-
-
+			/*
 			if ((Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnRight ()) 
 			{
-				//this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) * (currentMoveForce * Input.GetAxis("Horizontal")); /*this.transform.right*/;
+				//this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) * (currentMoveForce * Input.GetAxis("Horizontal"));
 
 				if(P1isHunted)
 					transform.Translate(Input.GetAxis("Horizontal")* Time.deltaTime * currentMoveForce,0,0);
 				else if(!P1isHunted)
 					transform.Translate(Input.GetAxis("Horizontal2")* Time.deltaTime * currentMoveForce,0,0);
-				isInputToMove = true;
+				//isInputToMove = true;
 
 			}
+			*/
 
 			if (isOnGround && !isInputToMove) 
 			{
@@ -278,9 +301,10 @@ public class PlayerControls : MonoBehaviour {
 		return false;
 	}
 
-	private void Slide()
+	public void ResetPosition()
 	{
-
+		this.transform.localPosition = Vector3.zero;
+		Hit (Vector3.zero);
 	}
 
 	private void Jump()
@@ -301,13 +325,39 @@ public class PlayerControls : MonoBehaviour {
 		}
 	}
 
-	public void Hit(Vector3 hitterPosition)
+	public bool Hit(Vector3 hitterPosition)
 	{
-		this.GetComponent<AudioSource> ().Play ();
-		lastHitTime = Time.time;
-		float bumpForce = 10;
-		this.GetComponent<Rigidbody> ().velocity = (this.transform.position - hitterPosition).normalized * bumpForce;
-		this.GetComponent<Animator> ().SetTrigger ("hit");
+		if (!invicible)
+		{
+			float random = Random.Range (0.0f, 1.0f);
+			if (random < 0.75f) {
+				soundEngine.PlaySound("hit");
+			} else {
+				if (P1isHunted)
+				{
+					soundEngine.PlaySound("hitGirl");
+				}
+				else
+				{
+					soundEngine.PlaySound("hitDemon");
+				}
+			}
+			lastHitTime = Time.time;
+			invicible = true;
+			StartCoroutine (WaitAndMakePlayerHitableAgain (invicibilityTimeAfterHit));
+			float bumpForce = 10;
+			this.GetComponent<Rigidbody> ().velocity = (this.transform.position - hitterPosition).normalized * bumpForce;
+			this.GetComponent<Animator> ().SetTrigger ("hit");
+			mainCamera.GetComponent<CameraEffectsBehaviour> ().Shake (0.2f);
+			return true;
+		}
+		return false;
+	}
+
+	IEnumerator WaitAndMakePlayerHitableAgain(float timer)
+	{
+		yield return new WaitForSeconds (timer);
+		invicible = false;
 	}
 
 	public void Bump(Vector3 bumperPosition, float bumpForce)

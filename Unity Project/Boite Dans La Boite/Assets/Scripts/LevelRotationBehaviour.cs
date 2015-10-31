@@ -29,6 +29,10 @@ public class LevelRotationBehaviour : MonoBehaviour
 
 	float oldZ;
 
+	public SoundEngineScript soundEngine;
+
+	public Animator hands;
+
 	// Use this for initialization
 	void Start () 
 	{
@@ -42,25 +46,50 @@ public class LevelRotationBehaviour : MonoBehaviour
 	{
 		if (P1isHunted) 
 		{
+			// P2 turns counterClockwise
 			if (Input.GetKey(KeyCode.RightArrow) || Input.GetAxis("Horizontal2") > 0.0f )
 			{
+				hands.SetBool("isRotatingCounterClockwise", true);
 				angle = angleSpeed;
 			}
+			else
+			{				
+				hands.SetBool("isRotatingCounterClockwise", false);
+			}
+			
+			// P2 turns clockwise
 			if (Input.GetKey(KeyCode.LeftArrow) || Input.GetAxis("Horizontal2") < 0.0f )
 			{
+				hands.SetBool("isRotatingClockwise", true);
 				angle = -angleSpeed;
+			}
+			else
+			{				
+				hands.SetBool("isRotatingClockwise", false);
 			}
 		}
-
 		else if (!P1isHunted) 
 		{
+			// P1 turns counterClockwise
 			if (Input.GetKey(KeyCode.RightArrow) || Input.GetAxis("Horizontal") > 0.0f )
 			{
+				hands.SetBool("isRotatingCounterClockwise", true);
 				angle = angleSpeed;
 			}
+			else
+			{				
+				hands.SetBool("isRotatingCounterClockwise", false);
+			}
+
+			// P1 turns clockwise
 			if (Input.GetKey(KeyCode.LeftArrow) || Input.GetAxis("Horizontal") < 0.0f )
 			{
+				hands.SetBool("isRotatingClockwise", true);
 				angle = -angleSpeed;
+			}
+			else
+			{				
+				hands.SetBool("isRotatingClockwise", false);
 			}
 		}
 

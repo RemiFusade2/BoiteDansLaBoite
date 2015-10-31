@@ -19,6 +19,8 @@ public class FacetteSwitchManager : MonoBehaviour {
 	private float lastMoveTime;
 	public bool isMoving;
 
+	private int movingDirection;
+
 	public List<GameObject> levels;
 
 	public int currentLevelIndex;
@@ -27,9 +29,12 @@ public class FacetteSwitchManager : MonoBehaviour {
 
 	public float timer = 0.5f; // set duration time in seconds in the Inspector
 	public bool launchTimer = false;
+	
+	public SoundEngineScript soundEngine;
 
 	// Use this for initialization
-	void Start () {
+	void Start () 
+	{
 		isMoving = false;
 	}
 	
@@ -66,6 +71,7 @@ public class FacetteSwitchManager : MonoBehaviour {
 			{
 				if (Input.GetKeyDown("[6]") || Input.GetButtonDown("Fire5P1"))
 				{
+					movingDirection = -1;
 					degree -= 90f;
 					currentLevelIndex = (currentLevelIndex + levels.Count - 1) % levels.Count;
 					
@@ -75,6 +81,7 @@ public class FacetteSwitchManager : MonoBehaviour {
 				}
 				if (Input.GetKeyDown("[4]")|| Input.GetButtonDown("Fire4P1"))
 				{
+					movingDirection = 1;
 					degree += 90f;
 					currentLevelIndex = (currentLevelIndex + 1) % levels.Count;
 					
@@ -109,7 +116,17 @@ public class FacetteSwitchManager : MonoBehaviour {
 				Player.GetComponent<PlayerControls>().DisableColliders();
 				launchTimer = false;
 
+				if (movingDirection == -1)
+				{
+					soundEngine.PlaySound("wooshLeft");
+				} 
+				else if (movingDirection == 1)
+				{
+					soundEngine.PlaySound("wooshRight");
+				}
+
 				// activate rails
+				/*
 				foreach (Transform child in levels[currentLevelIndex].transform)
 				{
 					if (child.tag.Equals("Rail"))
@@ -117,6 +134,7 @@ public class FacetteSwitchManager : MonoBehaviour {
 						child.GetComponent<RailBehaviour>().SetActivated(true);
 					}
 				}
+				*/
 			}
 		}
 
@@ -158,7 +176,27 @@ public class FacetteSwitchManager : MonoBehaviour {
 				else
 				{
 					Player.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionX;
-					//Player.transform.localPosition = new Vector3(0, Player.transform.localPosition.y, Player.transform.localPosition.z);
+				}
+
+				if (currentLevelIndex == 0)
+				{
+					// haunted mansion
+					soundEngine.PlayGhostBkgMusic();
+				} 
+				else if (currentLevelIndex == 1)
+				{
+					// forest
+					soundEngine.PlayForestBkgMusic();
+				}
+				else if (currentLevelIndex == 2)
+				{
+					// blocks
+					soundEngine.PlayBlocksBkgMusic();
+				}
+				else if (currentLevelIndex == 3)
+				{
+					// doll house
+					soundEngine.PlayPrincessBkgMusic();
 				}
 
 			}
