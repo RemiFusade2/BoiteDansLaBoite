@@ -264,14 +264,14 @@ public class PlayerControls : MonoBehaviour {
 		Ray isRightFootOnObstacleRayMinusEpsilon = new Ray (rightFoot.transform.position - epsilon * this.transform.parent.right, this.transform.parent.right);*/
 		Ray isRightMiddleOnObstacleRayPlusEpsilon = new Ray (rightMiddle.transform.position + epsilon * this.transform.parent.right, this.transform.parent.right);
 		Ray isRightMiddleOnObstacleRayMinusEpsilon = new Ray (rightMiddle.transform.position - epsilon * this.transform.parent.right, this.transform.parent.right);
-		RaycastHit outputHitLeftFoot, outputHitRightFoot;
-		float maxDistance = 0.2f;
-		if ((Physics.Raycast(isRightHeadOnObstacleRayPlusEpsilon, out outputHitLeftFoot, maxDistance - epsilon) && outputHitLeftFoot.collider.tag.Equals("Ground")) ||
-		    (Physics.Raycast(isRightHeadOnObstacleRayMinusEpsilon, out outputHitLeftFoot, maxDistance + epsilon) && outputHitLeftFoot.collider.tag.Equals("Ground")) ||
+		RaycastHit outputHit1, outputHit2, outputHit3, outputHit4;
+		float maxDistance = 0.3f;
+		if ((Physics.Raycast(isRightHeadOnObstacleRayPlusEpsilon, out outputHit1, maxDistance - epsilon) && outputHit1.collider.tag.Equals("Ground")) ||
+		    (Physics.Raycast(isRightHeadOnObstacleRayMinusEpsilon, out outputHit2, maxDistance + epsilon) && outputHit2.collider.tag.Equals("Ground")) ||
 		    /*(Physics.Raycast(isRightFootOnObstacleRayPlusEpsilon, out outputHitRightFoot, maxDistance - epsilon) && outputHitRightFoot.collider.tag.Equals("Ground"))||
 		    (Physics.Raycast(isRightFootOnObstacleRayMinusEpsilon, out outputHitRightFoot, maxDistance + epsilon) && outputHitRightFoot.collider.tag.Equals("Ground"))||*/
-		    (Physics.Raycast(isRightMiddleOnObstacleRayPlusEpsilon, out outputHitRightFoot, maxDistance + epsilon) && outputHitRightFoot.collider.tag.Equals("Ground")) ||
-		    (Physics.Raycast(isRightMiddleOnObstacleRayMinusEpsilon, out outputHitRightFoot, maxDistance + epsilon) && outputHitRightFoot.collider.tag.Equals("Ground"))  )
+		    (Physics.Raycast(isRightMiddleOnObstacleRayPlusEpsilon, out outputHit3, maxDistance + epsilon) && outputHit3.collider.tag.Equals("Ground")) ||
+		    (Physics.Raycast(isRightMiddleOnObstacleRayMinusEpsilon, out outputHit4, maxDistance + epsilon) && outputHit4.collider.tag.Equals("Ground"))  )
 		{
 			return true;
 		}
@@ -287,14 +287,14 @@ public class PlayerControls : MonoBehaviour {
 		Ray isLeftFootOnObstacleRayMinusEpsilon = new Ray (leftFoot.transform.position - epsilon * this.transform.parent.right, -this.transform.parent.right);*/
 		Ray isLeftMiddleOnObstacleRayPlusEpsilon = new Ray (leftMiddle.transform.position + epsilon * this.transform.parent.right, -this.transform.parent.right);
 		Ray isLeftMiddleOnObstacleRayMinusEpsilon = new Ray (leftMiddle.transform.position - epsilon * this.transform.parent.right, -this.transform.parent.right);
-		RaycastHit outputHit;
-		float maxDistance = 0.2f;
-		if ((Physics.Raycast(isLeftHeadOnObstacleRayPlusEpsilon, out outputHit, maxDistance - epsilon) && outputHit.collider.tag.Equals("Ground")) ||
-		    (Physics.Raycast(isLeftHeadOnObstacleRayMinusEpsilon, out outputHit, maxDistance + epsilon) && outputHit.collider.tag.Equals("Ground")) ||
+		RaycastHit outputHit1, outputHit2, outputHit3, outputHit4;
+		float maxDistance = 0.3f;
+		if ((Physics.Raycast(isLeftHeadOnObstacleRayPlusEpsilon, out outputHit1, maxDistance - epsilon) && outputHit1.collider.tag.Equals("Ground")) ||
+		    (Physics.Raycast(isLeftHeadOnObstacleRayMinusEpsilon, out outputHit2, maxDistance + epsilon) && outputHit2.collider.tag.Equals("Ground")) ||
 		    /*(Physics.Raycast(isLeftFootOnObstacleRayPlusEpsilon, out outputHit, maxDistance - epsilon) && outputHit.collider.tag.Equals("Ground"))||
 		    (Physics.Raycast(isLeftFootOnObstacleRayMinusEpsilon, out outputHit, maxDistance + epsilon) && outputHit.collider.tag.Equals("Ground"))||*/
-		    (Physics.Raycast(isLeftMiddleOnObstacleRayPlusEpsilon, out outputHit, maxDistance + epsilon) && outputHit.collider.tag.Equals("Ground"))||
-		    (Physics.Raycast(isLeftMiddleOnObstacleRayMinusEpsilon, out outputHit, maxDistance + epsilon) && outputHit.collider.tag.Equals("Ground")) )
+		    (Physics.Raycast(isLeftMiddleOnObstacleRayPlusEpsilon, out outputHit3, maxDistance + epsilon) && outputHit3.collider.tag.Equals("Ground"))||
+		    (Physics.Raycast(isLeftMiddleOnObstacleRayMinusEpsilon, out outputHit4, maxDistance + epsilon) && outputHit4.collider.tag.Equals("Ground")) )
 		{
 			return true;
 		}
