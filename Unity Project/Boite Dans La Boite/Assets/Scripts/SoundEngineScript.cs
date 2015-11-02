@@ -52,11 +52,6 @@ public class SoundEngineScript : MonoBehaviour {
 
 		FadeInMusic (menuBkgMusic, fadingTimeIntro);
 	}
-	
-	// Update is called once per frame
-	void Update () 
-	{
-	}
 
 	private void FadeInMusic(AudioSource music, float time)
 	{
@@ -143,6 +138,19 @@ public class SoundEngineScript : MonoBehaviour {
 		currentBkgMusicIntro = princessBkgMusicIntro;
 		currentBkgMusicLoop = princessBkgMusicLoop;
 		allCoroutines.Add (StartCoroutine (WaitAndPlaySound (princessBkgMusicIntro.clip.length, princessBkgMusicLoop)));
+	}
+	
+	public void PlayMenuBkgMusic()
+	{
+		foreach (Coroutine coroutine in allCoroutines)
+		{
+			StopCoroutine(coroutine);
+		}
+		FadeOutMusic (currentBkgMusicIntro, fadingTimeBetweenMusics);
+		FadeOutMusic (currentBkgMusicLoop, fadingTimeBetweenMusics);
+		FadeInMusic (menuBkgMusic, fadingTimeBetweenMusics);
+		currentBkgMusicIntro = menuBkgMusic;
+		currentBkgMusicLoop = menuBkgMusic;
 	}
 
 	IEnumerator WaitAndPlaySound(float timer, AudioSource sound)

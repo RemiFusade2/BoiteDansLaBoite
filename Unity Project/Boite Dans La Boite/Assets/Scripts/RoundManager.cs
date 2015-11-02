@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class RoundManager : MonoBehaviour {
 
@@ -27,34 +28,132 @@ public class RoundManager : MonoBehaviour {
 
 	public int counter = 0;
 
-	// Use this for initialization
-	void Start () {
+	public Text player1ScoreUI;
+	public Text player2ScoreUI;
 
-		timer = initialTimer;	
+	public GameObject inGameUI;
+
+	public GameObject pouvoirsP1Panel;
+	public GameObject pouvoirsP2Panel;
+	public Image pouvoirRotationP1;
+	public Image pouvoirRotationP2;
+	public Sprite pouvoirRotationAvailable;
+	public Sprite pouvoirRotationNotAvailable;
+	public Image pouvoirSwitchP1;
+	public Image pouvoirSwitchP2;
+	public Sprite pouvoirSwitchAvailable;
+	public Sprite pouvoirSwitchNotAvailable;
+	public Image pouvoirGeyserP1;
+	public Image pouvoirGeyserP2;
+	public Sprite pouvoirGeyserAvailable;
+	public Sprite pouvoirGeyserNotAvailable;
+
+	public float pouvoirRotationTimer;
+	private float lastRotationTime;
+	
+	public float pouvoirSwitchTimer;
+	private float lastSwitchTime;
+	
+	public float pouvoirGeyserTimer;
+	private float lastGeyserTime;
+
+	private bool gameIsRunning;
+
+	public bool IsGameRunning()
+	{
+		return gameIsRunning;
+	}
+
+	public bool IsRotationAvailable()
+	{
+		return (Time.time - lastRotationTime) > pouvoirRotationTimer;
+	}
+	public bool IsSwitchAvailable()
+	{
+		return (Time.time - lastSwitchTime) > pouvoirSwitchTimer;
+	}
+	public bool IsGeyserAvailable()
+	{
+		return (Time.time - lastGeyserTime) > pouvoirGeyserTimer;
+	}
+
+	private void UpdatePouvoirsAvailability()
+	{
+		pouvoirRotationP1.sprite = IsRotationAvailable() ? pouvoirRotationAvailable : pouvoirRotationNotAvailable;
+		pouvoirRotationP2.sprite = IsRotationAvailable() ? pouvoirRotationAvailable : pouvoirRotationNotAvailable;
+		pouvoirSwitchP1.sprite = IsSwitchAvailable() ? pouvoirSwitchAvailable : pouvoirSwitchNotAvailable;
+		pouvoirSwitchP2.sprite = IsSwitchAvailable() ? pouvoirSwitchAvailable : pouvoirSwitchNotAvailable;
+		pouvoirGeyserP1.sprite = IsGeyserAvailable() ? pouvoirGeyserAvailable : pouvoirGeyserNotAvailable;
+		pouvoirGeyserP2.sprite = IsGeyserAvailable() ? pouvoirGeyserAvailable : pouvoirGeyserNotAvailable;
+	}
+
+	public void UseRotation()
+	{
+		lastRotationTime = Time.time;
+	}
+	public void UseSwitch()
+	{
+		lastSwitchTime = Time.time;
+	}
+	public void UseGeyser()
+	{
+		lastGeyserTime = Time.time;
+	}
+
+	private void ResetPowers()
+	{
+		UseRotation ();
+		UseSwitch ();
+		UseGeyser ();
+	}
+
+	// Use this for initialization
+	void Start () 
+	{
+		gameIsRunning = false;
+	}
+
+	public void StartGame()
+	{
+		timer = initialTimer;
+		playerOneScore = 0;
+		playerTwoScore = 0;
+		currentRound = 0;
+		SetRound ();
+		StartCoroutine (WaitAndChangeRound (initialTimer));
+		playerScript.GetComponent<PlayerControls> ().StartGame ();
+		inGameUI.SetActive (true);
+		gameOver = false;
+		gameIsRunning = true;
 	}
 	
 	// Update is called once per frame
-	void Update () {
-
-		if (!gameOver) {
+	void Update () 
+	{
+		if (gameIsRunning && !gameOver) 
+		{
 			if (!interRound)
 			{
 				timer -= Time.deltaTime;
 			}
 			
-			if (interRound || startTimer) {
+			if (interRound || startTimer) 
+			{
 				interRoundTimer -= Time.deltaTime;
 				showTimerInterRound = true;
 			}
 
-			if (interRoundTimer <= 0.0f) {
+			if (interRoundTimer <= 0.0f) 
+			{
 				showTimerInterRound = false;
 				interRoundTimer = 3.0f;
 				startTimer = false;
 				interRound = false;
 			}
 			
-			if (timer <= 0.0f) {
+			/*
+			if (timer <= 0.0f) 
+			{
 				currentRound++;
 				timer = initialTimer;
 				interRound = true;
@@ -66,15 +165,17 @@ public class RoundManager : MonoBehaviour {
 				rotationScript.GetComponent<LevelRotationBehaviour>().P1isHunted = true;
 				facetteScript.GetComponent<FacetteSwitchManager>().P1isHunted = true;
 
+				UpdatePouvoirsVisibility(true);
 
-				while(counter < 17)
+				ResetPowers();
+
+				while(counter < geyserScript.Length)
 				{
 					geyserScript[counter].GetComponent<Geyser2BehaviourScript>().P1isHunted = true;
 					counter++;
 				}
 				
-				counter = 0;			
-
+				counter = 0;
 			}
 
 			else if(currentRound == 1 || currentRound == 3)
@@ -82,56 +183,108 @@ public class RoundManager : MonoBehaviour {
 				playerScript.GetComponent<PlayerControls>().P1isHunted = false;
 				rotationScript.GetComponent<LevelRotationBehaviour>().P1isHunted = false;
 				facetteScript.GetComponent<FacetteSwitchManager>().P1isHunted = false;
+				
+				UpdatePouvoirsVisibility(false);
 
-				while(counter < 17)
+				ResetPowers();
+
+				while(counter < geyserScript.Length)
 				{
 					geyserScript[counter].GetComponent<Geyser2BehaviourScript>().P1isHunted = false;
 					counter++;
 				}
 
 				counter = 0;
-
 			}
+			*/
 
 
-			if (currentRound == 0 && upScore == true && ! startTimer || currentRound == 2 && upScore == true && ! startTimer) {
-				playerOneScore += 10;
+			if (currentRound == 0 && upScore == true && ! startTimer || currentRound == 2 && upScore == true && ! startTimer) 
+			{
+				playerTwoScore += 10;
+				player2ScoreUI.text = playerTwoScore.ToString();
 				upScore = false;
-
 			}
 			
-			if (currentRound == 1 && upScore == true && ! startTimer || currentRound == 3 && upScore == true && ! startTimer) {
-				playerTwoScore += 10;
+			if (currentRound == 1 && upScore == true && ! startTimer || currentRound == 3 && upScore == true && ! startTimer) 
+			{
+				playerOneScore += 10;
+				player1ScoreUI.text = playerOneScore.ToString();
 				upScore = false;
 			}
 
-			if (currentRound == 4)
-				gameOver = true;
+			UpdatePouvoirsAvailability();
 		} 
 	}
 
-	void OnGUI()
+	public MenuEngine menuEngine;
+
+	IEnumerator WaitAndChangeRound(float timer)
 	{
+		yield return new WaitForSeconds (timer);
 
-		GUI.Label (new Rect (10, 10, 100, 20), "Player One Score : ", myGui); 
-		GUI.Label (new Rect (10, 35, 100, 20), playerOneScore.ToString(), myGui); 
+		currentRound++;
+		timer = initialTimer;
+		interRound = true;
 
-		GUI.Label (new Rect (Screen.width - 180, 10, 100, 20), "Player Two Score : ", myGui); 
-		GUI.Label (new Rect (Screen.width - 25, 35, 100, 20), playerTwoScore.ToString(), myGui); 
-
-		if (showTimerInterRound == true && interRoundTimer > 0) 
+		SetRound ();
+		
+		if (currentRound == 4)
 		{
-			int timer = (int) interRoundTimer +1 ;
-			GUI.Label (new Rect (Screen.width / 2, 10, 100, 20), timer.ToString (), myGui); 
+			gameOver = true;
+			menuEngine.ShowGameOver(playerOneScore, playerTwoScore);
 		}
-
-		if (gameOver) 
+		else
 		{
-			GUI.Box(new Rect(Screen.width/2 - 125, Screen.height/2 - 125,250, 250), "Game Over"); 
-
-			if(GUI.Button(new Rect(Screen.width/2 - 100, Screen.height/2 - 95 ,200, 30), "Retry"))
-				Application.LoadLevel(0);
+			StartCoroutine (WaitAndChangeRound (initialTimer));
 		}
-
 	}
+
+	private void SetRound()
+	{
+		if(currentRound == 0 || currentRound == 2)
+		{				
+			playerScript.GetComponent<PlayerControls>().SetP1IsHunted(true);
+			rotationScript.GetComponent<LevelRotationBehaviour>().P1isHunted = true;
+			facetteScript.GetComponent<FacetteSwitchManager>().P1isHunted = true;
+			
+			UpdatePouvoirsVisibility(true);
+			
+			ResetPowers();
+			
+			while(counter < geyserScript.Length)
+			{
+				geyserScript[counter].GetComponent<Geyser2BehaviourScript>().P1isHunted = true;
+				counter++;
+			}
+			
+			counter = 0;
+		}
+		
+		else if(currentRound == 1 || currentRound == 3)
+		{					
+			playerScript.GetComponent<PlayerControls>().SetP1IsHunted(false);
+			rotationScript.GetComponent<LevelRotationBehaviour>().P1isHunted = false;
+			facetteScript.GetComponent<FacetteSwitchManager>().P1isHunted = false;
+			
+			UpdatePouvoirsVisibility(false);
+			
+			ResetPowers();
+			
+			while(counter < geyserScript.Length)
+			{
+				geyserScript[counter].GetComponent<Geyser2BehaviourScript>().P1isHunted = false;
+				counter++;
+			}
+			
+			counter = 0;
+		}
+	}
+
+	private void UpdatePouvoirsVisibility (bool P1Hunted)
+	{
+		pouvoirsP1Panel.SetActive (!P1Hunted);
+		pouvoirsP2Panel.SetActive (P1Hunted);
+	}
+
 }

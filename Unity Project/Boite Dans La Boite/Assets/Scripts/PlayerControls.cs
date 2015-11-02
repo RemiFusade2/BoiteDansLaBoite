@@ -55,84 +55,97 @@ public class PlayerControls : MonoBehaviour {
 
 	public SoundEngineScript soundEngine;
 
+	public RoundManager roundManager;
+
 	private bool invicible;
 	public float invicibilityTimeAfterHit;
 
 	// Use this for initialization
-	void Start () {
+	void Start () 
+	{
+		this.GetComponent<Rigidbody> ().useGravity = false;
+	}
+
+	public void StartGame()
+	{
 		airJumpsExecuted = 0;
 		lastHitTime = 0;
 		rb = this.GetComponent<Rigidbody>();
 		thrustInitialValue = thrust;
-
+		
 		invicible = false;
 		
 		if (playerSprite != null) 
 		{
 			initialPlayerSpriteHorizontalScale = playerSprite.transform.localScale;
 		}
+		
+		this.GetComponent<Rigidbody> ().useGravity = true;
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
-		switchingFacette = facetteScript.isMoving;
-
-		if (switchingFacette) {
-			thrust = 0.0f;
-
-			initialVelocity = rb.velocity;
-			initialAngularVelocity = rb.angularVelocity;
-
-			hasSwitched = true;
-
-		} 
-
-		else if(! switchingFacette && hasSwitched)
-		{
-			rb.velocity = initialVelocity;
-			rb.angularVelocity = initialAngularVelocity;
-			hasSwitched = false;
-		}
-
-		if (this.transform.parent != null && !this.transform.parent.tag.Equals ("MainCamera")) 
-		{
-			bool isInputToMove = false;
-
-			float slopeAngle;
-			isOnGround = IsOnGround (out slopeAngle);
-			float slopeSlowDownRatioRight = (slopeAngle < -maxSlopeAngle) ? 0 : ((maxSlopeAngle + slopeAngle) / maxSlopeAngle);
-			slopeSlowDownRatioRight = (slopeSlowDownRatioRight > 1.1f) ? 1.1f : slopeSlowDownRatioRight;
-			float slopeSlowDownRatioLeft = (slopeAngle > maxSlopeAngle) ? 0 : ((maxSlopeAngle - slopeAngle) / maxSlopeAngle);
-			slopeSlowDownRatioLeft = (slopeSlowDownRatioLeft > 1.1f) ? 1.1f : slopeSlowDownRatioLeft;
-
-			float controlerInputLimit = 0.1f;
-			float p1ControlerHorizontalInput = Input.GetAxis("Horizontal");
-			float p2ControlerHorizontalInput = Input.GetAxis("Horizontal2");
-			if ( (Input.GetKey (KeyCode.Q) || (P1isHunted && p1ControlerHorizontalInput < -controlerInputLimit) || (!P1isHunted && p2ControlerHorizontalInput < -controlerInputLimit))
-			    && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnLeft ()) 
+		if (roundManager.IsGameRunning())
+		{switchingFacette = facetteScript.isMoving;
+			
+			if (switchingFacette) {
+				thrust = 0.0f;
+				
+				initialVelocity = rb.velocity;
+				initialAngularVelocity = rb.angularVelocity;
+				
+				hasSwitched = true;
+				
+			} 
+			
+			else if(! switchingFacette && hasSwitched)
 			{
-				float inputRatio = Input.GetKey (KeyCode.Q) ? 1 : Mathf.Abs((P1isHunted ? p1ControlerHorizontalInput : p2ControlerHorizontalInput));
-				Vector3 newVelocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) - inputRatio * currentMoveForce * slopeSlowDownRatioLeft * this.transform.right;
-				if (!float.IsNaN(newVelocity.x) && !float.IsNaN(newVelocity.y) && !float.IsNaN(newVelocity.z))
-				{
-					this.GetComponent<Rigidbody> ().velocity = newVelocity;
-				}
-				isInputToMove = true;
+				rb.velocity = initialVelocity;
+				rb.angularVelocity = initialAngularVelocity;
+				hasSwitched = false;
 			}
-			if ( (Input.GetKey (KeyCode.D) || (P1isHunted && p1ControlerHorizontalInput > controlerInputLimit) || (!P1isHunted && p2ControlerHorizontalInput > controlerInputLimit))
-				&& (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnRight ()) 
+			
+			if (this.transform.parent != null && !this.transform.parent.tag.Equals ("MainCamera")) 
 			{
-				float inputRatio = Input.GetKey (KeyCode.D) ? 1 : (P1isHunted ? p1ControlerHorizontalInput : p2ControlerHorizontalInput);
-				Vector3 newVelocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) + inputRatio * currentMoveForce * slopeSlowDownRatioRight * this.transform.right;
-				if (!float.IsNaN(newVelocity.x) && !float.IsNaN(newVelocity.y) && !float.IsNaN(newVelocity.z))
+				bool isInputToMove = false;
+				
+				float slopeAngle;
+				bool onGround = IsOnGround (out slopeAngle);
+				PlayLandSound(onGround);
+				isOnGround = onGround;
+				float slopeSlowDownRatioRight = (slopeAngle < -maxSlopeAngle) ? 0 : ((maxSlopeAngle + slopeAngle) / maxSlopeAngle);
+				slopeSlowDownRatioRight = (slopeSlowDownRatioRight > 1.1f) ? 1.1f : slopeSlowDownRatioRight;
+				float slopeSlowDownRatioLeft = (slopeAngle > maxSlopeAngle) ? 0 : ((maxSlopeAngle - slopeAngle) / maxSlopeAngle);
+				slopeSlowDownRatioLeft = (slopeSlowDownRatioLeft > 1.1f) ? 1.1f : slopeSlowDownRatioLeft;
+				
+				float controlerInputLimit = 0.1f;
+				float p1ControlerHorizontalInput = Input.GetAxis("Horizontal");
+				float p2ControlerHorizontalInput = Input.GetAxis("Horizontal2");
+				if ( (Input.GetKey (KeyCode.Q) || (P1isHunted && p1ControlerHorizontalInput < -controlerInputLimit) || (!P1isHunted && p2ControlerHorizontalInput < -controlerInputLimit))
+				    && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnLeft ()) 
 				{
-					this.GetComponent<Rigidbody> ().velocity = newVelocity;
+					float inputRatio = Input.GetKey (KeyCode.Q) ? 1 : Mathf.Abs((P1isHunted ? p1ControlerHorizontalInput : p2ControlerHorizontalInput));
+					Vector3 newVelocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) - inputRatio * currentMoveForce * slopeSlowDownRatioLeft * this.transform.right;
+					if (!float.IsNaN(newVelocity.x) && !float.IsNaN(newVelocity.y) && !float.IsNaN(newVelocity.z))
+					{
+						this.GetComponent<Rigidbody> ().velocity = newVelocity;
+					}
+					isInputToMove = true;
 				}
-				isInputToMove = true;
-			}
-
-			/*
+				if ( (Input.GetKey (KeyCode.D) || (P1isHunted && p1ControlerHorizontalInput > controlerInputLimit) || (!P1isHunted && p2ControlerHorizontalInput > controlerInputLimit))
+				    && (Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnRight ()) 
+				{
+					float inputRatio = Input.GetKey (KeyCode.D) ? 1 : (P1isHunted ? p1ControlerHorizontalInput : p2ControlerHorizontalInput);
+					Vector3 newVelocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) + inputRatio * currentMoveForce * slopeSlowDownRatioRight * this.transform.right;
+					if (!float.IsNaN(newVelocity.x) && !float.IsNaN(newVelocity.y) && !float.IsNaN(newVelocity.z))
+					{
+						this.GetComponent<Rigidbody> ().velocity = newVelocity;
+					}
+					isInputToMove = true;
+				}
+				
+				/*
 			if ((Time.time - lastHitTime > ignoreInputAfterHitTimer) && !IsObstacleOnRight ()) 
 			{
 				//this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0) * (currentMoveForce * Input.GetAxis("Horizontal"));
@@ -145,68 +158,89 @@ public class PlayerControls : MonoBehaviour {
 
 			}
 			*/
-
-			if (isOnGround && !isInputToMove) 
-			{
-				this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0);
-			}
-			if (!isOnGround) 
-			{
-				Vector3 newVelocitySlowedDown = new Vector3(this.GetComponent<Rigidbody> ().velocity.x * inAirSlowing, this.GetComponent<Rigidbody> ().velocity.y, this.GetComponent<Rigidbody> ().velocity.z * inAirSlowing);
-				this.GetComponent<Rigidbody> ().velocity = newVelocitySlowedDown;
-			}
-
-
-			if (isOnGround && !Input.GetKeyDown (KeyCode.Space) ) 
-			{
-				thrust = thrustInitialValue;
-				currentMoveForce = strongMoveForce;
-				currentJumpForce = strongJumpForce;
-			}
-
-			if (!isOnGround) 
-			{
-				currentJumpForce = initialJumpForce;
-				thrust = 0.0f;
-				currentMoveForce = initialMoveForce;
-			}
-
-			if(P1isHunted)
-			{
-				if (Input.GetKeyDown (KeyCode.Space) || Input.GetButtonDown("JumpP1")) 
+				
+				if (isOnGround && !isInputToMove) 
 				{
-					thrust = 0.0f;
-					Jump ();
+					this.GetComponent<Rigidbody> ().velocity = new Vector3 (0, this.GetComponent<Rigidbody> ().velocity.y, 0);
 				}
-			}
-
-			else if(!P1isHunted)
-			{
-				if (Input.GetKeyDown (KeyCode.Space) || Input.GetButtonDown("Jump")) 
+				if (!isOnGround) 
 				{
-					thrust = 0.0f;
-					Jump ();
+					Vector3 newVelocitySlowedDown = new Vector3(this.GetComponent<Rigidbody> ().velocity.x * inAirSlowing, this.GetComponent<Rigidbody> ().velocity.y, this.GetComponent<Rigidbody> ().velocity.z * inAirSlowing);
+					this.GetComponent<Rigidbody> ().velocity = newVelocitySlowedDown;
 				}
-			}
-
-
-			if (this.GetComponent<Animator> () != null) 
-			{
-				Vector3 horizontalVelocity = new Vector3 (this.GetComponent<Rigidbody> ().velocity.x, 0, this.GetComponent<Rigidbody> ().velocity.z);
-				this.GetComponent<Animator> ().SetInteger ("moveSpeed", Mathf.RoundToInt (horizontalVelocity.magnitude));
-				this.GetComponent<Animator> ().SetBool ("onGround", isOnGround);
-			}
-
-			if (mainCamera != null) 
-			{				
-				float direction = Vector3.Dot (this.GetComponent<Rigidbody> ().velocity, mainCamera.transform.right);
-				float epsilon = 0.01f;
-				if (playerSprite != null && Mathf.Abs (direction) > epsilon) 
+				
+				
+				if (isOnGround && !Input.GetKeyDown (KeyCode.Space) ) 
 				{
-					playerSprite.transform.localScale = new Vector3 ((direction < 0 ? -1 : 1) * initialPlayerSpriteHorizontalScale.x, initialPlayerSpriteHorizontalScale.y, initialPlayerSpriteHorizontalScale.z);
+					thrust = thrustInitialValue;
+					currentMoveForce = strongMoveForce;
+					currentJumpForce = strongJumpForce;
+				}
+				
+				if (!isOnGround) 
+				{
+					currentJumpForce = initialJumpForce;
+					thrust = 0.0f;
+					currentMoveForce = initialMoveForce;
+				}
+				
+				if(P1isHunted)
+				{
+					if (Input.GetKeyDown (KeyCode.Space) || Input.GetButtonDown("JumpP1")) 
+					{
+						thrust = 0.0f;
+						Jump ();
+					}
+				}
+				
+				else if(!P1isHunted)
+				{
+					if (Input.GetKeyDown (KeyCode.Space) || Input.GetButtonDown("Jump")) 
+					{
+						thrust = 0.0f;
+						Jump ();
+					}
+				}
+				
+				
+				if (this.GetComponent<Animator> () != null) 
+				{
+					Vector3 horizontalVelocity = new Vector3 (this.GetComponent<Rigidbody> ().velocity.x, 0, this.GetComponent<Rigidbody> ().velocity.z);
+					this.GetComponent<Animator> ().SetInteger ("moveSpeed", Mathf.RoundToInt (horizontalVelocity.magnitude));
+					this.GetComponent<Animator> ().SetBool ("onGround", isOnGround);
+				}
+				
+				if (mainCamera != null) 
+				{				
+					float direction = Vector3.Dot (this.GetComponent<Rigidbody> ().velocity, mainCamera.transform.right);
+					float epsilon = 0.01f;
+					if (playerSprite != null && Mathf.Abs (direction) > epsilon) 
+					{
+						playerSprite.transform.localScale = new Vector3 ((direction < 0 ? -1 : 1) * initialPlayerSpriteHorizontalScale.x, initialPlayerSpriteHorizontalScale.y, initialPlayerSpriteHorizontalScale.z);
+					}
 				}
 			}
 		}
+	}
+
+	public void SetP1IsHunted(bool newP1IsHunted)
+	{
+		P1isHunted = newP1IsHunted;		
+		if (playerSprite != null) 
+		{
+			playerSprite.GetComponent<SpriteRenderer>().color = P1isHunted ? Color.white : new Color(255/255.0f,111/255.0f,0);
+		}
+	}
+
+	private bool wasOnGround;
+
+	private void PlayLandSound(bool isOnGround)
+	{
+		if (!wasOnGround && isOnGround)
+		{
+			soundEngine.PlaySound("playerLands");
+		}
+		wasOnGround = isOnGround;
 	}
 
 	private bool IsOnGround(out float slopeAngle)
@@ -257,7 +291,7 @@ public class PlayerControls : MonoBehaviour {
 
 	private bool IsObstacleOnRight()
 	{
-		float epsilon = 0.1f;
+		float epsilon = 0.01f;
 		Ray isRightHeadOnObstacleRayPlusEpsilon = new Ray (rightHead.transform.position + epsilon * this.transform.parent.right, this.transform.parent.right);
 		Ray isRightHeadOnObstacleRayMinusEpsilon = new Ray (rightHead.transform.position - epsilon * this.transform.parent.right, this.transform.parent.right);
 		/*Ray isRightFootOnObstacleRayPlusEpsilon = new Ray (rightFoot.transform.position + epsilon * this.transform.parent.right, this.transform.parent.right);
@@ -265,7 +299,7 @@ public class PlayerControls : MonoBehaviour {
 		Ray isRightMiddleOnObstacleRayPlusEpsilon = new Ray (rightMiddle.transform.position + epsilon * this.transform.parent.right, this.transform.parent.right);
 		Ray isRightMiddleOnObstacleRayMinusEpsilon = new Ray (rightMiddle.transform.position - epsilon * this.transform.parent.right, this.transform.parent.right);
 		RaycastHit outputHit1, outputHit2, outputHit3, outputHit4;
-		float maxDistance = 0.3f;
+		float maxDistance = 0.5f;
 		if ((Physics.Raycast(isRightHeadOnObstacleRayPlusEpsilon, out outputHit1, maxDistance - epsilon) && outputHit1.collider.tag.Equals("Ground")) ||
 		    (Physics.Raycast(isRightHeadOnObstacleRayMinusEpsilon, out outputHit2, maxDistance + epsilon) && outputHit2.collider.tag.Equals("Ground")) ||
 		    /*(Physics.Raycast(isRightFootOnObstacleRayPlusEpsilon, out outputHitRightFoot, maxDistance - epsilon) && outputHitRightFoot.collider.tag.Equals("Ground"))||
@@ -280,7 +314,7 @@ public class PlayerControls : MonoBehaviour {
 	
 	private bool IsObstacleOnLeft()
 	{
-		float epsilon = 0.1f;
+		float epsilon = 0.01f;
 		Ray isLeftHeadOnObstacleRayPlusEpsilon = new Ray (leftHead.transform.position + epsilon * this.transform.parent.right, -this.transform.parent.right);
 		Ray isLeftHeadOnObstacleRayMinusEpsilon = new Ray (leftHead.transform.position - epsilon * this.transform.parent.right, -this.transform.parent.right);
 		/*Ray isLeftFootOnObstacleRayPlusEpsilon = new Ray (leftFoot.transform.position + epsilon * this.transform.parent.right, -this.transform.parent.right);
@@ -288,7 +322,7 @@ public class PlayerControls : MonoBehaviour {
 		Ray isLeftMiddleOnObstacleRayPlusEpsilon = new Ray (leftMiddle.transform.position + epsilon * this.transform.parent.right, -this.transform.parent.right);
 		Ray isLeftMiddleOnObstacleRayMinusEpsilon = new Ray (leftMiddle.transform.position - epsilon * this.transform.parent.right, -this.transform.parent.right);
 		RaycastHit outputHit1, outputHit2, outputHit3, outputHit4;
-		float maxDistance = 0.3f;
+		float maxDistance = 0.5f;
 		if ((Physics.Raycast(isLeftHeadOnObstacleRayPlusEpsilon, out outputHit1, maxDistance - epsilon) && outputHit1.collider.tag.Equals("Ground")) ||
 		    (Physics.Raycast(isLeftHeadOnObstacleRayMinusEpsilon, out outputHit2, maxDistance + epsilon) && outputHit2.collider.tag.Equals("Ground")) ||
 		    /*(Physics.Raycast(isLeftFootOnObstacleRayPlusEpsilon, out outputHit, maxDistance - epsilon) && outputHit.collider.tag.Equals("Ground"))||
@@ -364,6 +398,9 @@ public class PlayerControls : MonoBehaviour {
 	{
 		lastHitTime = Time.time;
 		this.GetComponent<Rigidbody> ().velocity = (this.transform.position - bumperPosition).normalized * bumpForce;
+
+		int random = Random.Range (1, 3);
+		soundEngine.PlaySound ("boing" + random.ToString());
 	}
 
 	public void DisableColliders()

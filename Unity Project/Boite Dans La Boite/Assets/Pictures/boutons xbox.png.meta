@@ -1,15 +1,14 @@
 fileFormatVersion: 2
-guid: aabca2b25e715a546b9a2b0a96b5be2a
-timeCreated: 1446392967
+guid: 47d9854681638b749ada15476051724a
+timeCreated: 1446404184
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: signaux_0
-    21300002: signaux_1
-    21300004: signaux_2
-    21300006: signaux_3
-    21300008: signaux_4
-    21300010: signaux_5
+    21300000: boutons xbox_0
+    21300002: boutons xbox_1
+    21300004: boutons xbox_2
+    21300006: boutons xbox_3
+    21300008: boutons xbox_4
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -55,47 +54,7 @@ TextureImporter:
   buildTargetSettings: []
   spriteSheet:
     sprites:
-    - name: signaux_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 128
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-    - name: signaux_1
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 128
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-    - name: signaux_2
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 64
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-    - name: signaux_3
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 64
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-    - name: signaux_4
+    - name: boutons xbox_0
       rect:
         serializedVersion: 2
         x: 0
@@ -105,10 +64,40 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: signaux_5
+    - name: boutons xbox_1
       rect:
         serializedVersion: 2
         x: 64
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: boutons xbox_2
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: boutons xbox_3
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: boutons xbox_4
+      rect:
+        serializedVersion: 2
+        x: 256
         y: 0
         width: 64
         height: 64

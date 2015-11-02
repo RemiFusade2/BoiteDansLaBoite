@@ -32,6 +32,8 @@ public class FacetteSwitchManager : MonoBehaviour {
 	
 	public SoundEngineScript soundEngine;
 
+	public RoundManager roundManager;
+
 	// Use this for initialization
 	void Start () 
 	{
@@ -39,23 +41,23 @@ public class FacetteSwitchManager : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () 
+	void Update ()
 	{
-		if (!isMoving && (Time.time - lastMoveTime) > timeBetweenTwoMoves)
-		{	
-
+		if (!isMoving)
+		{
 			if(P1isHunted)
 			{
-				if (Input.GetKeyDown("[6]") || Input.GetButtonDown("Fire5"))
+				if ((Input.GetKeyDown("[6]") || Input.GetButtonDown("Fire5")) && roundManager.IsSwitchAvailable())
 				{
 					degree -= 90f;
 					currentLevelIndex = (currentLevelIndex + levels.Count - 1) % levels.Count;
 					
 					launchTimer = true;
 					timer = 0.5f;
-					//isMoving = true;
+
+					roundManager.UseSwitch();
 				}
-				if (Input.GetKeyDown("[4]")|| Input.GetButtonDown("Fire4"))
+				if ((Input.GetKeyDown("[4]")|| Input.GetButtonDown("Fire4")) && roundManager.IsSwitchAvailable())
 				{
 					degree += 90f;
 					currentLevelIndex = (currentLevelIndex + 1) % levels.Count;
@@ -63,13 +65,12 @@ public class FacetteSwitchManager : MonoBehaviour {
 					launchTimer = true;
 					timer = 0.5f;
 					
-					//isMoving = true;
+					roundManager.UseSwitch();
 				}
 			}
-
 			else if (!P1isHunted)
 			{
-				if (Input.GetKeyDown("[6]") || Input.GetButtonDown("Fire5P1"))
+				if ((Input.GetKeyDown("[6]") || Input.GetButtonDown("Fire5P1")) && roundManager.IsSwitchAvailable())
 				{
 					movingDirection = -1;
 					degree -= 90f;
@@ -77,9 +78,10 @@ public class FacetteSwitchManager : MonoBehaviour {
 					
 					launchTimer = true;
 					timer = 0.5f;
-					//isMoving = true;
+
+					roundManager.UseSwitch();
 				}
-				if (Input.GetKeyDown("[4]")|| Input.GetButtonDown("Fire4P1"))
+				if ((Input.GetKeyDown("[4]")|| Input.GetButtonDown("Fire4P1")) && roundManager.IsSwitchAvailable())
 				{
 					movingDirection = 1;
 					degree += 90f;
@@ -88,10 +90,9 @@ public class FacetteSwitchManager : MonoBehaviour {
 					launchTimer = true;
 					timer = 0.5f;
 					
-					//isMoving = true;
+					roundManager.UseSwitch();
 				}
 			}
-
 
 			if(launchTimer)
 			{
